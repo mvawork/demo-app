@@ -1,0 +1,31 @@
+logging:
+  file:
+    name: ./logs/application.log
+#  level:
+#    org.springframework:
+#      security: debug
+vaadin:
+  launch-browser: true
+  frontend:
+    hotdeploy: true
+  allowed-packages: ru/menshevva/demoapp/ui
+
+spring:
+  application:
+    name: demo-app
+  profiles:
+    group:
+      dev:
+        - oauth
+        - db
+        - report
+      test:
+        - oauth
+        - db
+        - report
+      prod:
+        - oauth
+        - db
+        - report
+server:
+  port: ${PORT:8080}

@@ -1,0 +1,30 @@
+:host {
+  display: flex;
+  height: 100%;
+  width: 100%;
+}
+
+.content-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 50px;
+}
+
+.content-left > a {
+  background: #90ccc1;
+  color: white;
+  font-size: 18px;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  display: block;
+  text-align: center;
+}
+
+.content-right {
+  display: flex;
+  flex-grow: 1;
+  background: url("../../images/error-404.svg") no-repeat center;
+}

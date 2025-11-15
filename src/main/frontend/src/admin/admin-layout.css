@@ -1,0 +1,75 @@
+:host {
+    display: flex;
+    flex-direction: row;
+    position: relative;
+    height: 100%;
+    width: 100%;
+}
+
+.menu-block {
+    flex-direction: column;
+    width: 10%;
+    display: flex;
+    margin-right: 15px;
+    margin-top: 1%;
+}
+
+.menu-item {
+    position: relative;
+    display: block;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    background-color: white;
+    margin-bottom: 10px;
+    line-height: 1.2;
+}
+
+.menu-item a {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+    overflow: hidden;
+    color: black;
+}
+
+.menu-item[is-active]  {
+    background: #90ccc1;
+}
+
+.content-block {
+    border-radius: 10px;
+}
+
+.switcher {
+    display: block;
+    text-decoration: none;
+    color: black;
+}
+
+.switcher > span {
+    background-color: transparent;
+}
+
+.switcher:after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    content: '';
+    pointer-events: none;
+    border-left-color: black;
+    border-style: none;
+}
+
+.switcher:hover {
+    color: black;
+}
+
+.switcher:hover > span {
+    background-color: transparent;
+}

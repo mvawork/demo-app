@@ -1,0 +1,46 @@
+:host {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.error-403 {
+    text-align: center;
+    vertical-align: middle;
+    color: #52a3cd;
+    margin-left: 0;
+    padding: 0;
+    font-size: 15em;
+}
+
+.error-description {
+    text-align: center;
+    margin: -75px 0 0 0;
+    padding: 0;
+    font-size: 2em;
+}
+
+.block-error-left {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    background-color: white;
+}
+
+.block-error {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    background: white;
+}
+
+.block-error-columns {
+    display: flex;
+    margin: auto;
+}
+
+.block-error-image {
+    background: url("../../images/access_denied.svg") no-repeat;
+}

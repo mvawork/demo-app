@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <title>Сессия закончилась</title>
+    <link th:href="@{/styles/session-expired-styles.css}" rel="stylesheet">
+</head>
+<body class="body notranslate">
+<div class="container">
+    <div class="content content-second">
+        <div class="logo-container">
+            <img th:src="@{/img/logo.svg}" alt=""/>
+        </div>
+        <h1 class="header">Ваша сессия закончилась</h1>
+        <p class="message message-first">
+            Пожалуйста нажмите на кнопку чтобы войти в приложение
+        </p>
+        <p class="message message-second">
+            Если Ваша SSO-сессия действительна, Вам не нужно входить в систему заново
+        </p>
+    </div>
+    <button class="btn"><a th:href="@{/}">Войти в приложение</a></button>
+</div>
+</body>
+</html>
+

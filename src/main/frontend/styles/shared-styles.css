@@ -1,0 +1,56 @@
+.content-block {
+    display: flex;
+    position: relative;
+    flex-grow: 1;
+}
+
+.switcher {
+    font-size: 12px;
+    position: relative;
+    display: block;
+    width: 68px;
+    margin-right: auto;
+    margin-bottom: 18px;
+    margin-left: auto;
+    padding: 0;
+    text-align: center;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: #ffffff;
+    border: none;
+    outline: 0;
+    background-color: transparent;
+}
+
+
+.switcher > span {
+    background-color: #91ccc2;
+}
+
+.switcher:hover {
+    color: white;
+}
+
+.switcher:hover > span {
+    background-color: #d4d4d3;
+}
+.switcher[is-active] > span {
+    background-color: #ffffff;
+}
+
+.switcher[is-active] {
+    color: #ffffff;
+}
+
+.switcher-icon {
+    display: block;
+    width: 50px;
+    height: 50px;
+    margin-right: auto;
+    margin-left: auto;
+    border-radius: 50%;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 35px;
+}
+

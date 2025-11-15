@@ -1,0 +1,25 @@
+.action-block {
+    display: flex;
+    background-color: white;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+}
+
+.action-block-left {
+    display: flex;
+    flex-grow: 1;
+}
+.action-block-right {
+    display: flex;
+}
+
+.action-block-left > * {
+    margin-right: 10px;
+}
+.action-block-right > * {
+    margin-left: 10px;
+}
+
+
+

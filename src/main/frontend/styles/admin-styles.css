@@ -1,0 +1,17 @@
+.left-panel {
+    background-color: #d4d4d3;
+    border-radius: 15px;
+    padding: 20px;
+}
+
+.right-panel {
+    border: 2px solid #d4d4d3;
+    padding: 20px;
+    border-radius: 15px;
+}
+
+.but {
+    background: none;
+    color: #e0b236;
+    font-weight: bold;
+}

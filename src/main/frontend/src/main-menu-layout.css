@@ -1,0 +1,48 @@
+:host {
+    display: flex;
+    flex-direction: row;
+    position: relative;
+    height: 100%;
+    width: 100%;
+}
+
+.navigation-panel {
+    display: block;
+    position: relative;
+    width: 88px;
+    min-width: 88px;
+    height: 100%;
+    z-index: 1;
+    user-select: none;
+    background: linear-gradient(45deg, rgb(152, 207, 195), rgb(86, 181, 184));
+}
+
+.menu-items:first-child {
+    margin-top: 15px;
+}
+
+.menu-items {
+    overflow: hidden;
+    overflow-y: auto;
+}
+
+.content-block {
+    padding: 20px;
+    background: linear-gradient(45deg, #e6e9f0, #eef1f5);
+}
+
+#main .switcher-icon {
+    background-image: url("../images/home.svg");
+}
+#admin .switcher-icon {
+    background-image: url("../images/admin.svg");
+}
+#my-competencies .switcher-icon {
+    background-image: url("../images/my_competence.svg");
+}
+#history-competencies .switcher-icon {
+    background-image: url("../images/history_competence.svg");
+}
+#team-competencies .switcher-icon {
+    background-image: url("../images/team_competence.svg");
+}

@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import ru.menshevva.demoapp.dto.role.RoleListData;
 import ru.menshevva.demoapp.security.entities.RoleEntity;
 import ru.menshevva.demoapp.security.entities.RoleEntity_;
-import ru.menshevva.demoapp.service.common.AbstractSearchService;
 import ru.menshevva.demoapp.service.roles.RoleSearchFilter;
 import ru.menshevva.demoapp.service.roles.RoleSearchService;
 
@@ -23,7 +22,7 @@ import static ru.menshevva.demoapp.service.roles.RoleSearchFilter.*;
 
 @Service
 @Slf4j
-public class RoleSearchServiceImpl extends AbstractSearchService implements RoleSearchService {
+public class RoleSearchServiceImpl implements RoleSearchService {
 
     @PersistenceContext
     private EntityManager em;

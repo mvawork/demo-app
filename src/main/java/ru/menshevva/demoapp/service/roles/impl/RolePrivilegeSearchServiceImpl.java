@@ -13,7 +13,6 @@ import ru.menshevva.demoapp.security.entities.*;
 import ru.menshevva.demoapp.security.entities.PrivilegeEntity;
 import ru.menshevva.demoapp.security.entities.RoleEntity;
 import ru.menshevva.demoapp.security.entities.RolePrivilegeEntity;
-import ru.menshevva.demoapp.service.common.AbstractSearchService;
 import ru.menshevva.demoapp.service.roles.RolePrivilegeSearchFilter;
 import ru.menshevva.demoapp.service.roles.RolePrivilegeSearchService;
 
@@ -28,7 +27,7 @@ import static ru.menshevva.demoapp.service.roles.RoleSearchFilter.FILTER_ROLE_NA
 
 @Service
 @Slf4j
-public class RolePrivilegeSearchServiceImpl extends AbstractSearchService implements RolePrivilegeSearchService {
+public class RolePrivilegeSearchServiceImpl implements RolePrivilegeSearchService {
 
     @PersistenceContext
     private EntityManager em;

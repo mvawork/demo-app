@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import ru.menshevva.demoapp.security.ApplicationRoles;
 import ru.menshevva.demoapp.security.SecurityUtils;
 import ru.menshevva.demoapp.ui.admin.users.UserListView;
+import ru.menshevva.demoapp.ui.clients.ClientListView;
 import ru.menshevva.demoapp.ui.components.MenuItem;
 import ru.menshevva.demoapp.ui.components.MenuItemProvider;
 
@@ -38,10 +39,17 @@ public class MainMenuLayout extends LitTemplate implements RouterLayout, AfterNa
         result.add(MenuItem.builder().id("main").title("")
                 .url(RouteConfiguration.forApplicationScope().getUrl(WelcomeView.class)).build());
 
+        if (SecurityUtils.checkPermission(ApplicationRoles.ROLE_CLIENTS)) {
+            result.add(MenuItem.builder().id("Клиенты").title("Клиенты")
+                    .url(RouteConfiguration.forApplicationScope().getUrl(ClientListView.class)).build());
+        }
+
         if (SecurityUtils.checkPermission(ApplicationRoles.ROLE_ADMIN)) {
             result.add(MenuItem.builder().id("admin").title("Админ")
                     .url(RouteConfiguration.forApplicationScope().getUrl(UserListView.class)).build());
         }
+
+
 
         return result;
     }

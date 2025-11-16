@@ -12,7 +12,6 @@ import ru.menshevva.demoapp.dto.userrole.UserRoleListData;
 import ru.menshevva.demoapp.security.entities.*;
 import ru.menshevva.demoapp.security.entities.RoleEntity;
 import ru.menshevva.demoapp.security.entities.UserRoleEntity;
-import ru.menshevva.demoapp.service.common.AbstractSearchService;
 import ru.menshevva.demoapp.service.users.UserRoleSearchFilter;
 import ru.menshevva.demoapp.service.users.UserRoleSearchService;
 
@@ -24,7 +23,7 @@ import static ru.menshevva.demoapp.service.users.UserRoleSearchFilter.*;
 
 @Service
 @Slf4j
-public class UserRoleSearchServiceImpl extends AbstractSearchService implements UserRoleSearchService {
+public class UserRoleSearchServiceImpl implements UserRoleSearchService {
 
     @PersistenceContext
     private EntityManager em;

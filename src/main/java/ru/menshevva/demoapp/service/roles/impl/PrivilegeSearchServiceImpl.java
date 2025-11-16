@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import ru.menshevva.demoapp.dto.privilege.PrivilegeListData;
 import ru.menshevva.demoapp.security.entities.*;
 import ru.menshevva.demoapp.security.entities.PrivilegeEntity;
-import ru.menshevva.demoapp.service.common.AbstractSearchService;
 import ru.menshevva.demoapp.service.roles.PrivilegeSearchFilter;
 import ru.menshevva.demoapp.service.roles.PrivilegeSearchService;
 
@@ -23,7 +22,7 @@ import static ru.menshevva.demoapp.service.roles.PrivilegeSearchFilter.*;
 
 @Service
 @Slf4j
-public class PrivilegeSearchServiceImpl extends AbstractSearchService implements PrivilegeSearchService {
+public class PrivilegeSearchServiceImpl implements PrivilegeSearchService {
 
     @PersistenceContext
     private EntityManager em;

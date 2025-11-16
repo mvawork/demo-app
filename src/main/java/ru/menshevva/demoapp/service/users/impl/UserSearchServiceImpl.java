@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import ru.menshevva.demoapp.dto.UserListData;
 import ru.menshevva.demoapp.security.entities.UserEntity;
 import ru.menshevva.demoapp.security.entities.UserEntity_;
-import ru.menshevva.demoapp.service.common.AbstractSearchService;
 import ru.menshevva.demoapp.service.users.UserSearchFilter;
 import ru.menshevva.demoapp.service.users.UserSearchService;
 
@@ -24,7 +23,7 @@ import static ru.menshevva.demoapp.service.users.UserSearchFilter.*;
 
 @Service
 @Slf4j
-public class UserSearchServiceImpl extends AbstractSearchService implements UserSearchService {
+public class UserSearchServiceImpl implements UserSearchService {
 
 
     @PersistenceContext

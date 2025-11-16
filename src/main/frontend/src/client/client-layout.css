@@ -1,0 +1,12 @@
+:host {
+    display: flex;
+    flex-direction: row;
+    position: relative;
+    height: 100%;
+    width: 100%;
+}
+
+.content-block {
+    border-radius: 10px;
+}
+

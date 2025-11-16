@@ -1,0 +1,15 @@
+create schema clients;
+create sequence clients.sq_dat_client;
+
+alter sequence clients.sq_dat_client owner to extapp;
+
+create table clients.dat_client
+(
+    client_id    bigint not null
+        primary key,
+    client_name  varchar(255)
+);
+
+alter table clients.dat_client
+    owner to extapp;
+

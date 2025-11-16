@@ -6,3 +6,11 @@ spring:
   jpa:
     hibernate:
      ddl-auto: update
+
+second:
+  datasource:
+#    enable: false
+    url: ${SECOND_DB_URL}
+    username: ${SECOND_DB_USER}
+    password: ${SECOND_DB_PASSWORD}
+    configuration:

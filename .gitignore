@@ -46,3 +46,4 @@ build/
 /.run/**
 /logs/**
 /config/local/**
+/.kilocode/**

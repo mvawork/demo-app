@@ -35,6 +35,58 @@ public class SecurityConfig {
 
     @Configuration
     @Import(VaadinAwareSecurityContextHolderStrategyConfiguration.class)
+    public static class ApplicationSecurityConfiguration {
+
+        @Bean
+        SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+            // Configure your static resources with public access
+            http.authorizeHttpRequests(auth -> auth.requestMatchers(
+                            "/favicon.ico",
+                            "/styles.css",
+                            "/icons/**",
+                            "/images/**",
+                            "/styles/**",
+                            "/styles/**",
+                            "/logged-out",
+                            "/session-expired",
+                            "/no-access",
+                            "/blocked-user",
+                            "/no-such-user",
+                            "/back-channel-logout")
+                    .permitAll());
+
+            // Configure Vaadin's security using VaadinSecurityConfigurer
+            http.with(VaadinSecurityConfigurer.vaadin(), configurer -> {
+                        configurer.oauth2LoginPage(
+                                "/oauth2/authorization/keycloak"
+                                //"{baseUrl}/logged-out"
+                        )
+                                //.logoutSuccessHandler()
+                        ;
+                    })
+/*
+                    .logout(logout ->
+                            logout
+                                    .logoutRequestMatcher(PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.GET, "/logout"))
+                    )
+*/
+            ;
+            return http.build();
+        }
+
+        @Bean
+        public OAuth2UserService<OidcUserRequest, OidcUser> getOidcUserOAuth2UserService(SecurityService securityService) {
+            var delegate = new OidcUserService();
+            return userRequest -> {
+                var oidcUser = delegate.loadUser(userRequest);
+                return securityService.getOidcUser(oidcUser);
+            };
+        }
+
+    }
+
+    //@Configuration
+    //@Import(VaadinAwareSecurityContextHolderStrategyConfiguration.class)
     @RequiredArgsConstructor
     public static class Oauth2SecurityConfiguration {
 
@@ -42,8 +94,7 @@ public class SecurityConfig {
 
         private final GrantedAuthoritiesMapper authoritiesMapper;
 
-
-        @Bean
+//        @Bean
         SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
             http.authorizeHttpRequests(auth ->
                     auth.requestMatchers("/favicon.ico",
@@ -62,9 +113,9 @@ public class SecurityConfig {
                             .permitAll()
             );
             http.with(VaadinSecurityConfigurer.vaadin(), configurer -> {
-                    }
-            );
-            http
+                            }
+                    )
+
                     .oauth2Login(oauth2Login ->
                             oauth2Login.clientRegistrationRepository(clientRegistrationRepository)
                                     .userInfoEndpoint(userInfoEndpointConfig ->
@@ -81,7 +132,7 @@ public class SecurityConfig {
             return http.build();
         }
 
-        @Bean
+//        @Bean
         public OAuth2UserService<OidcUserRequest, OidcUser> getOidcUserOAuth2UserService(SecurityService securityService) {
             var delegate = new OidcUserService();
             return userRequest -> {
@@ -96,7 +147,6 @@ public class SecurityConfig {
             logoutSuccessHandler.setPostLogoutRedirectUri("{baseUrl}/logged-out");
             return logoutSuccessHandler;
         }
-
 
     }
 

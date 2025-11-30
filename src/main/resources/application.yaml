@@ -8,7 +8,7 @@ vaadin:
   launch-browser: true
   frontend:
     hotdeploy: true
-  allowed-packages: ru/menshevva/demoapp/ui
+#  allowed-packages: ru/menshevva/demoapp/ui
 
 spring:
   application:

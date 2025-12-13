@@ -249,7 +249,7 @@
             <dependencies>
                 <dependency>
                     <groupId>com.vaadin</groupId>
-                    <artifactId>vaadin</artifactId>
+                    <artifactId>vaadin-core</artifactId>
                     <exclusions>
                         <exclusion>
                             <groupId>com.vaadin</groupId>
@@ -267,10 +267,8 @@
                         <version>${vaadin.version}</version>
                         <executions>
                             <execution>
-                                <id>frontend</id>
                                 <phase>compile</phase>
                                 <goals>
-                                    <goal>prepare-frontend</goal>
                                     <goal>build-frontend</goal>
                                 </goals>
                             </execution>

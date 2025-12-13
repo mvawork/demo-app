@@ -14,5 +14,6 @@ public class UserData {
     private BigInteger userId;
     private String userLogin;
     private String userName;
+    private String userPassword;
 
 }

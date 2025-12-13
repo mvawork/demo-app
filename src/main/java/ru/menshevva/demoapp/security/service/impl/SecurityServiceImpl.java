@@ -6,9 +6,11 @@ import jakarta.persistence.criteria.JoinType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 import ru.menshevva.demoapp.security.AppOidcUser;
+import ru.menshevva.demoapp.security.AppUser;
 import ru.menshevva.demoapp.security.dto.UserData;
 import ru.menshevva.demoapp.security.entities.*;
 import ru.menshevva.demoapp.security.entities.UserEntity;
@@ -34,7 +36,8 @@ public class SecurityServiceImpl implements SecurityService {
         var root = cq.from(UserEntity.class);
         return em.createQuery(cq.multiselect(root.get(UserEntity_.userId).alias(UserEntity_.USER_ID),
                                 root.get(UserEntity_.userLogin).alias(UserEntity_.USER_LOGIN),
-                                root.get(UserEntity_.userName).alias(UserEntity_.USER_NAME)
+                                root.get(UserEntity_.userName).alias(UserEntity_.USER_NAME),
+                                root.get(UserEntity_.userPassword).alias(UserEntity_.USER_PASSWORD)
                         )
                         .where(cb.equal(cb.lower(root.get(UserEntity_.userLogin)), userLogin.toLowerCase())))
                 .getResultList()
@@ -43,6 +46,7 @@ public class SecurityServiceImpl implements SecurityService {
                         .userId(v.get(UserEntity_.USER_ID, UserEntity_.userId.getJavaType()))
                         .userLogin(v.get(UserEntity_.USER_LOGIN, UserEntity_.userLogin.getJavaType()))
                         .userName(v.get(UserEntity_.USER_NAME, UserEntity_.userName.getJavaType()))
+                        .userPassword(v.get(UserEntity_.USER_PASSWORD, UserEntity_.userPassword.getJavaType()))
                         .build())
                 .findFirst();
     }
@@ -85,4 +89,14 @@ public class SecurityServiceImpl implements SecurityService {
                                 .build()));
     }
 
+    @Override
+    public User findByUsername(String username) {
+        return getUserInfo(username)
+                .map(v -> {
+                            var appUser = new AppUser(v.getUserName(), v.getUserPassword(), getUserAuthorities(v.getUserId()), v);
+                            return appUser;
+                        }
+                )
+                .orElse(null);
+    }
 }

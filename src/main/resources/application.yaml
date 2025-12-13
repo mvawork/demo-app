@@ -8,13 +8,16 @@ vaadin:
   launch-browser: true
   frontend:
     hotdeploy: true
-#  allowed-packages: ru/menshevva/demoapp/ui
+    allowed-packages: ru/menshevva/demoapp/ui
 
 spring:
   application:
     name: demo-app
   profiles:
     group:
+      local-dev:
+        - db
+        - report
       dev:
         - oauth
         - db

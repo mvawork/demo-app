@@ -15,8 +15,9 @@ create table auth.dat_user
 (
     user_id    bigint not null
         primary key,
-    user_login varchar(255),
-    user_name  varchar(255)
+    user_login varchar(255) not null,
+    user_name  varchar(255) not null,
+    user_password varchar(255)
 );
 
 alter table auth.dat_user
@@ -41,11 +42,12 @@ create table auth.dat_role
     role_name        varchar(255)
 );
 
-comment on column auth.dat_role.role_id is 'Иденьификатор роли';
+comment on column auth.dat_role.role_id is 'Идентификатор роли';
 
 comment on column auth.dat_role.role_description is 'Описание роли';
 
 comment on column auth.dat_role.role_name is 'Название роли';
+
 
 alter table auth.dat_role
     owner to testapp;

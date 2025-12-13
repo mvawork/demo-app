@@ -1,31 +1,32 @@
 package ru.menshevva.demoapp.security.config;
 
 import com.vaadin.flow.spring.security.VaadinAwareSecurityContextHolderStrategyConfiguration;
-import com.vaadin.flow.spring.security.VaadinSavedRequestAwareAuthenticationSuccessHandler;
 import com.vaadin.flow.spring.security.VaadinSecurityConfigurer;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.core.authority.mapping.SimpleAuthorityMapper;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
-import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import ru.menshevva.demoapp.security.service.SecurityService;
+import ru.menshevva.demoapp.ui.LoginView;
 
 @Slf4j
 @Configuration
 @EnableWebSecurity
+@Import(VaadinAwareSecurityContextHolderStrategyConfiguration.class)
 public class SecurityConfig {
 
     @Bean
@@ -33,121 +34,58 @@ public class SecurityConfig {
         return new SimpleAuthorityMapper();
     }
 
-    @Configuration
-    @Import(VaadinAwareSecurityContextHolderStrategyConfiguration.class)
-    public static class ApplicationSecurityConfiguration {
-
-        @Bean
-        SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-            // Configure your static resources with public access
-            http.authorizeHttpRequests(auth -> auth.requestMatchers(
-                            "/favicon.ico",
-                            "/styles.css",
-                            "/icons/**",
-                            "/images/**",
-                            "/styles/**",
-                            "/styles/**",
-                            "/logged-out",
-                            "/session-expired",
-                            "/no-access",
-                            "/blocked-user",
-                            "/no-such-user",
-                            "/back-channel-logout")
-                    .permitAll());
-
-            // Configure Vaadin's security using VaadinSecurityConfigurer
-            http.with(VaadinSecurityConfigurer.vaadin(), configurer -> {
-                        configurer.oauth2LoginPage(
-                                "/oauth2/authorization/keycloak"
-                                //"{baseUrl}/logged-out"
-                        )
-                                //.logoutSuccessHandler()
-                        ;
-                    })
-/*
-                    .logout(logout ->
-                            logout
-                                    .logoutRequestMatcher(PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.GET, "/logout"))
-                    )
-*/
-            ;
-            return http.build();
-        }
-
-        @Bean
-        public OAuth2UserService<OidcUserRequest, OidcUser> getOidcUserOAuth2UserService(SecurityService securityService) {
-            var delegate = new OidcUserService();
-            return userRequest -> {
-                var oidcUser = delegate.loadUser(userRequest);
-                return securityService.getOidcUser(oidcUser);
-            };
-        }
-
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
-    //@Configuration
-    //@Import(VaadinAwareSecurityContextHolderStrategyConfiguration.class)
-    @RequiredArgsConstructor
-    public static class Oauth2SecurityConfiguration {
+    @Bean
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        // Configure your static resources with public access
+        http.authorizeHttpRequests(auth -> auth.requestMatchers(
+                        "/favicon.ico",
+                        "/styles.css",
+                        "/icons/**",
+                        "/images/**",
+                        "/styles/**",
+                        "/styles/**",
+                        "/logged-out",
+                        "/session-expired",
+                        "/no-access",
+                        "/blocked-user",
+                        "/no-such-user",
+                        "/back-channel-logout")
+                .permitAll());
 
-        private final ClientRegistrationRepository clientRegistrationRepository;
+        // Configure Vaadin's security using VaadinSecurityConfigurer
+        http.with(VaadinSecurityConfigurer.vaadin(), configurer -> {
+            configurer.loginView(LoginView.class);
+            //configurer.oauth2LoginPage("/oauth2/authorization/keycloak");
+        });
+        return http.build();
+    }
 
-        private final GrantedAuthoritiesMapper authoritiesMapper;
+    @Bean
+    public OAuth2UserService<OidcUserRequest, OidcUser> getOidcUserOAuth2UserService(SecurityService securityService) {
+        var delegate = new OidcUserService();
+        return userRequest -> {
+            var oidcUser = delegate.loadUser(userRequest);
+            return securityService.getOidcUser(oidcUser);
+        };
+    }
 
-//        @Bean
-        SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-            http.authorizeHttpRequests(auth ->
-                    auth.requestMatchers("/favicon.ico",
-                                    "/styles.css",
-                                    "/icons/**",
-                                    "/images/**",
-                                    "/styles/**",
-                                    "/styles/**",
-                                    "/logged-out",
-                                    "/session-expired",
-                                    "/no-access",
-                                    "/blocked-user",
-                                    "/no-such-user",
-                                    "/back-channel-logout"
-                            )
-                            .permitAll()
-            );
-            http.with(VaadinSecurityConfigurer.vaadin(), configurer -> {
-                            }
-                    )
-
-                    .oauth2Login(oauth2Login ->
-                            oauth2Login.clientRegistrationRepository(clientRegistrationRepository)
-                                    .userInfoEndpoint(userInfoEndpointConfig ->
-                                            userInfoEndpointConfig.userAuthoritiesMapper(authoritiesMapper))
-                                    .successHandler(new VaadinSavedRequestAwareAuthenticationSuccessHandler())
-
-                    )
-                    .logout(httpSecurityLogoutConfigurer ->
-                            httpSecurityLogoutConfigurer
-                                    .logoutSuccessHandler(logoutSuccessHandler())
-                                    .logoutRequestMatcher(PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.GET, "/logout"))
-                    );
-
-            return http.build();
-        }
-
-//        @Bean
-        public OAuth2UserService<OidcUserRequest, OidcUser> getOidcUserOAuth2UserService(SecurityService securityService) {
-            var delegate = new OidcUserService();
-            return userRequest -> {
-                var oidcUser = delegate.loadUser(userRequest);
-                return securityService.getOidcUser(oidcUser);
-            };
-        }
-
-
-        private OidcClientInitiatedLogoutSuccessHandler logoutSuccessHandler() {
-            var logoutSuccessHandler = new OidcClientInitiatedLogoutSuccessHandler(clientRegistrationRepository);
-            logoutSuccessHandler.setPostLogoutRedirectUri("{baseUrl}/logged-out");
-            return logoutSuccessHandler;
-        }
-
+    @Bean
+    public UserDetailsService userDetailsService(SecurityService securityService) {
+        return username -> {
+            // 1. Ищем пользователя по логину в базе данных
+            var user = securityService.findByUsername(username);
+            if (user == null) {
+                throw new UsernameNotFoundException("Пользователь не найден");
+                // Если пользователь не существует
+            }
+            // 2. Возвращаем полную информацию о пользователе
+            return user;
+        };
     }
 
 }

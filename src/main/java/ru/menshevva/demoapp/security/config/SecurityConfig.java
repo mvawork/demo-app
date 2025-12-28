@@ -26,7 +26,6 @@ import ru.menshevva.demoapp.ui.LoginView;
 @Slf4j
 @Configuration
 @EnableWebSecurity
-@Import(VaadinAwareSecurityContextHolderStrategyConfiguration.class)
 public class SecurityConfig {
 
     @Bean
@@ -59,8 +58,8 @@ public class SecurityConfig {
 
         // Configure Vaadin's security using VaadinSecurityConfigurer
         http.with(VaadinSecurityConfigurer.vaadin(), configurer -> {
-            configurer.loginView(LoginView.class);
-            //configurer.oauth2LoginPage("/oauth2/authorization/keycloak");
+            //configurer.loginView(LoginView.class);
+            configurer.oauth2LoginPage("/oauth2/authorization/keycloak");
         });
         return http.build();
     }

@@ -1,9 +1,8 @@
 package ru.menshevva.demoapp.ui.components;
 
 
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.BaseJsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.BaseJsonNode;
 
 import java.util.List;
 import java.util.Objects;

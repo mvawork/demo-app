@@ -1,10 +1,8 @@
 package ru.menshevva.demoapp.security.vaadin;
 
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.server.VaadinServletRequest;
 import com.vaadin.flow.spring.annotation.SpringComponent;
-import org.springframework.boot.autoconfigure.web.ServerProperties;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.boot.web.server.autoconfigure.ServerProperties;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @SpringComponent

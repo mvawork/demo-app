@@ -12,6 +12,7 @@ import ru.menshevva.demoapp.ui.admin.users.UserListView;
 import ru.menshevva.demoapp.ui.clients.ClientListView;
 import ru.menshevva.demoapp.ui.components.MenuItem;
 import ru.menshevva.demoapp.ui.components.MenuItemProvider;
+import ru.menshevva.demoapp.ui.references.ReferencesView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +39,8 @@ public class MainMenuLayout extends LitTemplate implements RouterLayout, AfterNa
         var result = new ArrayList<MenuItem>();
         result.add(MenuItem.builder().id("main").title("")
                 .url(RouteConfiguration.forApplicationScope().getUrl(WelcomeView.class)).build());
+        result.add(MenuItem.builder().id("references").title("Справочники")
+                .url(RouteConfiguration.forApplicationScope().getUrl(ReferencesView.class)).build());
 
         if (SecurityUtils.checkPermission(ApplicationRoles.ROLE_CLIENTS)) {
             result.add(MenuItem.builder().id("Клиенты").title("Клиенты")

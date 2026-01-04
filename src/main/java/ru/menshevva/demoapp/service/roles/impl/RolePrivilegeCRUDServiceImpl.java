@@ -6,8 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.menshevva.demoapp.dto.roleprivilege.RolePrivilegeData;
-import ru.menshevva.demoapp.security.entities.RolePrivilegeEntity;
-import ru.menshevva.demoapp.security.entities.RolePrivilegeEntity_;
+import ru.menshevva.demoapp.entities.main.auth.RolePrivilegeEntity;
+import ru.menshevva.demoapp.entities.main.auth.RolePrivilegeEntity_;
 import ru.menshevva.demoapp.service.roles.RolePrivilegeCRUDService;
 
 import java.math.BigInteger;

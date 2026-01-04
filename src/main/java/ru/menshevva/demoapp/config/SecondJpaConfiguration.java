@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
-import ru.menshevva.demoapp.entities.second.ClientEntity;
 
 import javax.sql.DataSource;
 import java.util.LinkedHashMap;
@@ -17,7 +16,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Configuration(proxyBeanMethods = false)
-public class SecondEntityManagerFactoryConfiguration {
+public class SecondJpaConfiguration {
 
     @Qualifier("second")
     @Bean(defaultCandidate = false)
@@ -32,7 +31,7 @@ public class SecondEntityManagerFactoryConfiguration {
                                                                              @Qualifier("second") JpaProperties jpaProperties) {
         EntityManagerFactoryBuilder builder = createEntityManagerFactoryBuilder(jpaProperties);
         return builder.dataSource(dataSource)
-                .packages(ClientEntity.class)
+                .packages("ru.menshevva.demoapp.entities.second")
                 .persistenceUnit("second").build();
     }
 

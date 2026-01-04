@@ -7,9 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.menshevva.demoapp.dto.privilege.PrivilegeData;
+import ru.menshevva.demoapp.entities.main.auth.PrivilegeEntity_;
 import ru.menshevva.demoapp.exception.EAppException;
-import ru.menshevva.demoapp.security.entities.PrivilegeEntity;
-import ru.menshevva.demoapp.security.entities.PrivilegeEntity_;
+import ru.menshevva.demoapp.entities.main.auth.PrivilegeEntity;
 import ru.menshevva.demoapp.service.roles.PrivilegeCRUDService;
 
 import java.math.BigInteger;

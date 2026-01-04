@@ -9,8 +9,8 @@ import jakarta.persistence.criteria.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.menshevva.demoapp.dto.UserListData;
-import ru.menshevva.demoapp.security.entities.UserEntity;
-import ru.menshevva.demoapp.security.entities.UserEntity_;
+import ru.menshevva.demoapp.entities.main.auth.UserEntity;
+import ru.menshevva.demoapp.entities.main.auth.UserEntity_;
 import ru.menshevva.demoapp.service.users.UserSearchFilter;
 import ru.menshevva.demoapp.service.users.UserSearchService;
 

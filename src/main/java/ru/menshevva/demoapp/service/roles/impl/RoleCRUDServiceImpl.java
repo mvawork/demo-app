@@ -8,9 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.menshevva.demoapp.dto.role.RoleData;
+import ru.menshevva.demoapp.entities.main.auth.RoleEntity_;
 import ru.menshevva.demoapp.exception.EAppException;
-import ru.menshevva.demoapp.security.entities.RoleEntity;
-import ru.menshevva.demoapp.security.entities.RoleEntity_;
+import ru.menshevva.demoapp.entities.main.auth.RoleEntity;
 import ru.menshevva.demoapp.service.roles.RoleCRUDService;
 import ru.menshevva.demoapp.service.roles.RolePrivilegeCRUDService;
 

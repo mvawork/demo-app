@@ -9,12 +9,10 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
+import ru.menshevva.demoapp.entities.main.auth.*;
 import ru.menshevva.demoapp.security.AppOidcUser;
 import ru.menshevva.demoapp.security.AppUser;
 import ru.menshevva.demoapp.security.dto.UserData;
-import ru.menshevva.demoapp.security.entities.*;
-import ru.menshevva.demoapp.security.entities.UserEntity;
-import ru.menshevva.demoapp.security.entities.UserRoleEntity;
 import ru.menshevva.demoapp.security.service.SecurityService;
 
 import java.math.BigInteger;

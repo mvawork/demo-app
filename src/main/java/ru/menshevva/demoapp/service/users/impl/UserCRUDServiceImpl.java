@@ -6,10 +6,10 @@ import jakarta.persistence.PersistenceContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.menshevva.demoapp.entities.main.auth.UserEntity_;
 import ru.menshevva.demoapp.exception.EAppException;
 import ru.menshevva.demoapp.security.dto.UserData;
-import ru.menshevva.demoapp.security.entities.UserEntity;
-import ru.menshevva.demoapp.security.entities.UserEntity_;
+import ru.menshevva.demoapp.entities.main.auth.UserEntity;
 import ru.menshevva.demoapp.service.users.UserCRUDService;
 
 import java.math.BigInteger;

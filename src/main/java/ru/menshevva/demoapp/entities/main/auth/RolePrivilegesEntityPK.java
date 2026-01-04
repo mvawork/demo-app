@@ -1,4 +1,4 @@
-package ru.menshevva.demoapp.security.entities;
+package ru.menshevva.demoapp.entities.main.auth;
 
 import lombok.Getter;
 import lombok.Setter;

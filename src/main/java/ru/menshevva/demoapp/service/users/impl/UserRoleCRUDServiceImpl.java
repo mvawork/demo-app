@@ -5,8 +5,8 @@ import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.menshevva.demoapp.dto.userrole.UserRoleData;
-import ru.menshevva.demoapp.security.entities.UserRoleEntity;
-import ru.menshevva.demoapp.security.entities.UserRoleEntity_;
+import ru.menshevva.demoapp.entities.main.auth.UserRoleEntity;
+import ru.menshevva.demoapp.entities.main.auth.UserRoleEntity_;
 import ru.menshevva.demoapp.service.users.UserRoleCRUDService;
 
 @Service

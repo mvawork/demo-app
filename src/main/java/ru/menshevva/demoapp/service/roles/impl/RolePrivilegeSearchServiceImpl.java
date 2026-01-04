@@ -9,10 +9,7 @@ import jakarta.persistence.criteria.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.menshevva.demoapp.dto.roleprivilege.RolePrivilegeListData;
-import ru.menshevva.demoapp.security.entities.*;
-import ru.menshevva.demoapp.security.entities.PrivilegeEntity;
-import ru.menshevva.demoapp.security.entities.RoleEntity;
-import ru.menshevva.demoapp.security.entities.RolePrivilegeEntity;
+import ru.menshevva.demoapp.entities.main.auth.*;
 import ru.menshevva.demoapp.service.roles.RolePrivilegeSearchFilter;
 import ru.menshevva.demoapp.service.roles.RolePrivilegeSearchService;
 

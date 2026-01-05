@@ -7,6 +7,7 @@ import jakarta.persistence.criteria.JoinType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
+import ru.menshevva.demoapp.dto.ChangeStatus;
 import ru.menshevva.demoapp.dto.metadata.ReferenceData;
 import ru.menshevva.demoapp.dto.metadata.ReferenceFieldData;
 import ru.menshevva.demoapp.entities.main.metadata.ReferenceEntity;
@@ -81,6 +82,7 @@ public class ReferenceSearchServiceImpl implements ReferenceSearchService, Initi
                         root.get(ReferenceEntity_.schemaName).alias(ReferenceEntity_.SCHEMA_NAME),
                         root.get(ReferenceEntity_.tableName).alias(ReferenceEntity_.TABLE_NAME),
                         root.get(ReferenceEntity_.tableSql).alias(ReferenceEntity_.TABLE_SQL),
+                        joinField.get(ReferenceFieldEntity_.fieldId).alias(ReferenceFieldEntity_.FIELD_ID),
                         joinField.get(ReferenceFieldEntity_.fieldName).alias(ReferenceFieldEntity_.FIELD_NAME),
                         joinField.get(ReferenceFieldEntity_.fieldTitle).alias(ReferenceFieldEntity_.FIELD_TITLE),
                         joinField.get(ReferenceFieldEntity_.fieldOrder).alias(ReferenceFieldEntity_.FIELD_ORDER),
@@ -106,11 +108,14 @@ public class ReferenceSearchServiceImpl implements ReferenceSearchService, Initi
                             .tableSQL(t.get(ReferenceEntity_.TABLE_SQL, ReferenceEntity_.tableSql.getJavaType()))
                             .build();
                     var fieldList = entry.getValue().stream()
-                            .map(tuple -> ReferenceFieldData.builder()
-                                    .fieldName(tuple.get(ReferenceFieldEntity_.FIELD_NAME, ReferenceFieldEntity_.fieldName.getJavaType()))
-                                    .fieldTitle(tuple.get(ReferenceFieldEntity_.FIELD_TITLE, ReferenceFieldEntity_.fieldTitle.getJavaType()))
-                                    .fieldLength(tuple.get(ReferenceFieldEntity_.FIELD_LENGTH, ReferenceFieldEntity_.fieldLength.getJavaType()))
-                                    .fieldOrder(tuple.get(ReferenceFieldEntity_.FIELD_ORDER, ReferenceFieldEntity_.fieldOrder.getJavaType()))
+                            .filter(v -> v.get(ReferenceFieldEntity_.FIELD_ID, ReferenceFieldEntity_.referenceId.getJavaType()) != null)
+                            .map(v -> ReferenceFieldData.builder()
+                                    .fieldId(v.get(ReferenceFieldEntity_.FIELD_ID, ReferenceFieldEntity_.referenceId.getJavaType()))
+                                    .fieldName(v.get(ReferenceFieldEntity_.FIELD_NAME, ReferenceFieldEntity_.fieldName.getJavaType()))
+                                    .fieldTitle(v.get(ReferenceFieldEntity_.FIELD_TITLE, ReferenceFieldEntity_.fieldTitle.getJavaType()))
+                                    .fieldLength(v.get(ReferenceFieldEntity_.FIELD_LENGTH, ReferenceFieldEntity_.fieldLength.getJavaType()))
+                                    .fieldOrder(v.get(ReferenceFieldEntity_.FIELD_ORDER, ReferenceFieldEntity_.fieldOrder.getJavaType()))
+                                    .changeStatus(ChangeStatus.UNCHANGED)
                                     .build()
                             )
                             .collect(Collectors.toList());

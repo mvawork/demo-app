@@ -12,6 +12,8 @@ import ru.menshevva.demoapp.service.metadata.MetaDataCRUDservice;
 import ru.menshevva.demoapp.ui.components.EditActionCallback;
 import ru.menshevva.demoapp.ui.components.EditActionComponent;
 
+import java.util.ArrayList;
+
 @SpringComponent
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class MetaDataEditDialog extends Dialog implements EditActionCallback {
@@ -34,13 +36,13 @@ public class MetaDataEditDialog extends Dialog implements EditActionCallback {
         setCloseOnOutsideClick(false);
         setDraggable(true);
         add(content);
-
     }
 
     public void editValue(ReferenceData referenceData, EditActionCallback editActionCallback) {
         this.editActionCallback = editActionCallback;
         if (referenceData == null) {
             this.value = new ReferenceData();
+            this.value.setMetaDataFieldsList(new ArrayList<>());
         } else {
             this.value = referenceData;
         }
@@ -70,6 +72,16 @@ public class MetaDataEditDialog extends Dialog implements EditActionCallback {
         close();
         if (editActionCallback != null) {
             editActionCallback.cancel();
+        }
+    }
+
+    public void deleteValue(ReferenceData selectedItem, EditActionCallback editActionCallback) {
+        this.editActionCallback = editActionCallback;
+        if (value != null) {
+            service.delete(selectedItem.getReferenceId());
+            if (editActionCallback != null) {
+                editActionCallback.ok();
+            }
         }
     }
 }

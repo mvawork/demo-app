@@ -29,6 +29,10 @@ public class MetaDataListView extends VerticalLayout implements EditActionCallba
     private final MetaDataEditDialog editDialog;
     private Grid<ReferenceData> dataGrid;
     private HorizontalLayout actionPanel;
+    private ReferenceData selectedItem;
+    private Button addButton;
+    private Button editButton;
+    private Button deleteButton;
 
     public MetaDataListView(ReferenceSearchService searchService, MetaDataEditDialog editDialog) {
         this.searchService = searchService;
@@ -45,10 +49,12 @@ public class MetaDataListView extends VerticalLayout implements EditActionCallba
     private void createActionPanel() {
         this.actionPanel = new HorizontalLayout();
         var leftPanel = new HorizontalLayout();
-        var addButton = new Button("Добавить");
+        this.addButton = new Button("Добавить");
         addButton.addClickListener(this::addAction);
-        var editButton = new Button("Изменить");
-        var deleteButton = new Button("Удалить");
+        this.editButton = new Button("Изменить");
+        editButton.addClickListener(this::editAction);
+        this.deleteButton = new Button("Удалить");
+        deleteButton.addClickListener(this::deleteAction);
         leftPanel.add(addButton, editButton, deleteButton);
         var rightPanel = new HorizontalLayout();
         var searchButton = new Button("Найти");
@@ -58,6 +64,18 @@ public class MetaDataListView extends VerticalLayout implements EditActionCallba
         actionPanel.add(leftPanel, rightPanel);
         actionPanel.setFlexGrow(1, rightPanel);
         actionPanel.setWidthFull();
+    }
+
+    private void deleteAction(ClickEvent<Button> buttonClickEvent) {
+        if (selectedItem != null) {
+            editDialog.deleteValue(selectedItem, this);
+        }
+    }
+
+    private void editAction(ClickEvent<Button> buttonClickEvent) {
+        if (selectedItem != null) {
+            editDialog.editValue(selectedItem, this);
+        }
     }
 
     private void addAction(ClickEvent<Button> buttonClickEvent) {
@@ -71,6 +89,13 @@ public class MetaDataListView extends VerticalLayout implements EditActionCallba
         dataGrid.addColumn(ReferenceData::getSchemaName)
                 .setHeader("Таблица");
         dataGrid.setDataProvider(dataProvider);
+        dataGrid.addSelectionListener(selectionEvent -> setSelectedItem(selectionEvent.getFirstSelectedItem().orElse(null)));
+    }
+
+    private void setSelectedItem(ReferenceData referenceData) {
+        this.selectedItem = referenceData;
+        editButton.setEnabled(referenceData != null);
+        deleteButton.setEnabled(referenceData != null);
     }
 
     @Override
@@ -79,6 +104,7 @@ public class MetaDataListView extends VerticalLayout implements EditActionCallba
     }
 
     private void refresh() {
+        searchService.refresh();
         dataGrid.deselectAll();
         //dataProvider.setFilter(buildQueryFilter());
         dataProvider.refreshAll();

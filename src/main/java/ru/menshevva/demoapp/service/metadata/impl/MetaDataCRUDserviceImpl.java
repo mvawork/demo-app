@@ -2,13 +2,20 @@ package ru.menshevva.demoapp.service.metadata.impl;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.CriteriaQuery;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.menshevva.demoapp.dto.ChangeStatus;
 import ru.menshevva.demoapp.dto.metadata.ReferenceData;
+import ru.menshevva.demoapp.dto.metadata.ReferenceFieldData;
 import ru.menshevva.demoapp.entities.main.metadata.ReferenceEntity;
+import ru.menshevva.demoapp.entities.main.metadata.ReferenceEntity_;
 import ru.menshevva.demoapp.entities.main.metadata.ReferenceFieldEntity;
+import ru.menshevva.demoapp.entities.main.metadata.ReferenceFieldEntity_;
 import ru.menshevva.demoapp.service.metadata.MetaDataCRUDservice;
+
+import java.util.List;
 
 @Service
 @Slf4j
@@ -28,12 +35,68 @@ public class MetaDataCRUDserviceImpl implements MetaDataCRUDservice {
         } else {
             update(value);
         }
-
     }
 
     private void update(ReferenceData value) {
+        var cb = entityManager.getCriteriaBuilder();
+        var cu = cb.createCriteriaUpdate(ReferenceEntity.class);
+        var root = cu.from(ReferenceEntity.class);
+        cu.set(ReferenceEntity_.schemaName, value.getSchemaName());
+        cu.set(ReferenceEntity_.tableName, value.getTableName());
+        cu.set(ReferenceEntity_.tableSql, value.getTableSQL());
+        cu.where(cb.equal(root.get(ReferenceEntity_.referenceId), value.getReferenceId()));
+        saveFields(value);
+    }
+
+    private void saveFields(ReferenceData value) {
+        value.getMetaDataFieldsList()
+                .stream()
+                .filter(v -> v.getChangeStatus() == ChangeStatus.DELETED && v.getFieldId() != null)
+                .forEach(this::deleteField);
+        value.getMetaDataFieldsList()
+                .stream()
+                .filter(field -> field.getChangeStatus() == ChangeStatus.MODIFIED)
+                .forEach(this::updateField);
+        value.getMetaDataFieldsList()
+                .stream()
+                .filter(field -> field.getChangeStatus() == ChangeStatus.ADD)
+                .forEach(v -> addField(value.getReferenceId(), v));
 
     }
+
+    private void addField(Long referenceId, ReferenceFieldData v) {
+        var e = new ReferenceFieldEntity();
+        e.setReferenceId(referenceId);
+        e.setFieldName(v.getFieldName());
+        e.setFieldTitle(v.getFieldTitle());
+        e.setFieldLength(v.getFieldLength());
+        e.setFieldOrder(v.getFieldOrder());
+        e.setFieldType(v.getFieldType());
+        entityManager.persist(e);
+        v.setFieldId(e.getFieldId());
+    }
+
+    private void updateField(ReferenceFieldData referenceFieldData) {
+        var cb = entityManager.getCriteriaBuilder();
+        var cu = cb.createCriteriaUpdate(ReferenceFieldEntity.class);
+        var root = cu.from(ReferenceFieldEntity.class);
+        cu.set(root.get(ReferenceFieldEntity_.fieldName), referenceFieldData.getFieldName());
+        cu.set(root.get(ReferenceFieldEntity_.fieldTitle), referenceFieldData.getFieldTitle());
+        cu.set(root.get(ReferenceFieldEntity_.fieldLength), referenceFieldData.getFieldLength());
+        cu.set(root.get(ReferenceFieldEntity_.fieldOrder), referenceFieldData.getFieldOrder());
+        cu.set(root.get(ReferenceFieldEntity_.fieldType), referenceFieldData.getFieldType());
+        cu.where(cb.equal(root.get(ReferenceFieldEntity_.fieldId), referenceFieldData.getFieldId()));
+        entityManager.createQuery(cu).executeUpdate();
+    }
+
+    private void deleteField(ReferenceFieldData referenceFieldData) {
+        var cb = entityManager.getCriteriaBuilder();
+        var cd = cb.createCriteriaDelete(ReferenceFieldEntity.class);
+        var root = cd.from(ReferenceFieldEntity.class);
+        cd.where(cb.equal(root.get(ReferenceFieldEntity_.fieldId), referenceFieldData.getFieldId()));
+        entityManager.createQuery(cd).executeUpdate();
+    }
+
 
     private void add(ReferenceData value) {
         var e = new ReferenceEntity();

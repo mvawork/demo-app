@@ -11,6 +11,8 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
+import com.vaadin.flow.data.provider.DataProvider;
+import ru.menshevva.demoapp.dto.ChangeStatus;
 import ru.menshevva.demoapp.dto.metadata.ReferenceData;
 import ru.menshevva.demoapp.dto.metadata.ReferenceFieldData;
 
@@ -21,6 +23,13 @@ public class MetaDataEditView extends VerticalLayout {
     private VerticalLayout mainView;
     private TextArea sqlView;
     private HorizontalLayout fieldView;
+    private final MetaDataFieldEditDialog fieldEditDialog = new MetaDataFieldEditDialog();
+    private ReferenceData editValue;
+    private Grid<ReferenceFieldData> fieldsGrid;
+    private ReferenceFieldData editFieldValue;
+    private Button addButton;
+    private Button editButton;
+    private Button deleteButton;
 
     public MetaDataEditView() {
         initMainView();
@@ -42,30 +51,69 @@ public class MetaDataEditView extends VerticalLayout {
     }
 
     private void initFieldView() {
-        this.fieldView = new HorizontalLayout();
-        var grid = new Grid<ReferenceFieldData>();
-        grid.addColumn(ReferenceFieldData::getFieldName)
-                .setHeader("Имя поля");
-        grid.addColumn(ReferenceFieldData::getFieldTitle)
-                .setHeader("Наименование поля");
-        grid.addColumn(ReferenceFieldData::getFieldLength)
-                .setHeader("Щирина поля");
-        grid.addColumn(ReferenceFieldData::getFieldOrder)
-                .setHeader("Позиция");
-
         var actionBlock = new VerticalLayout();
-        var addButton = new Button("Добавить");
+        this.addButton = new Button("Добавить");
         addButton.setWidthFull();
-        var editButton = new Button("Изменить");
+        addButton.addClickListener(event -> {
+            var value = new ReferenceFieldData();
+            value.setChangeStatus(ChangeStatus.ADD);
+            fieldEditDialog.setValue(value, () -> {
+                editValue.getMetaDataFieldsList().add(value);
+                fieldsGrid.getDataProvider().refreshAll();
+            });
+        });
+        this.editButton = new Button("Изменить");
         editButton.setWidthFull();
-        var deleteButton = new Button("Удалить");
+        editButton.addClickListener(event -> {
+                    if (editFieldValue != null) {
+                        if (editFieldValue.getChangeStatus() == ChangeStatus.UNCHANGED) {
+                            editFieldValue.setChangeStatus(ChangeStatus.MODIFIED);
+                        }
+                        fieldEditDialog.setValue(editFieldValue, () -> fieldsGrid.getDataProvider().refreshItem(editFieldValue));
+                    }
+                }
+        );
+        this.deleteButton = new Button("Удалить");
+        deleteButton.addClickListener(event -> {
+            if (editFieldValue != null) {
+                if (editFieldValue.getChangeStatus() == ChangeStatus.ADD) {
+                    editValue.getMetaDataFieldsList().remove(editFieldValue);
+                } else {
+                    editFieldValue.setChangeStatus(ChangeStatus.DELETED);
+                }
+                setSelectedField(null);
+                fieldsGrid.getDataProvider().refreshAll();
+            }
+        });
         deleteButton.setWidthFull();
+
+        this.fieldView = new HorizontalLayout();
+        this.fieldsGrid = new Grid<ReferenceFieldData>();
+        fieldsGrid.addColumn(ReferenceFieldData::getFieldName)
+                .setHeader("Имя поля");
+        fieldsGrid.addColumn(ReferenceFieldData::getFieldTitle)
+                .setHeader("Наименование поля");
+        fieldsGrid.addColumn(ReferenceFieldData::getFieldLength)
+                .setHeader("Щирина поля");
+        fieldsGrid.addColumn(ReferenceFieldData::getFieldOrder)
+                .setHeader("Позиция");
+        fieldsGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
+        fieldsGrid.addSelectionListener(e -> {
+            setSelectedField(e.getFirstSelectedItem().orElse(null));
+        });
+
         actionBlock.add(addButton, editButton, deleteButton);
         actionBlock.setWidth(100, Unit.PIXELS);
-        fieldView.add(grid, actionBlock);
+        fieldView.add(fieldsGrid, actionBlock);
         fieldView.setSizeFull();
-        fieldView.setFlexGrow(1, grid);
+        fieldView.setFlexGrow(1, fieldsGrid);
         this.fieldView.setVisible(false);
+    }
+
+    private void setSelectedField(ReferenceFieldData value) {
+        this.editFieldValue = value;
+        editButton.setEnabled(editFieldValue != null);
+        deleteButton.setEnabled(editFieldValue != null);
     }
 
     private void initSqlView() {
@@ -89,7 +137,13 @@ public class MetaDataEditView extends VerticalLayout {
     }
 
     public void setValue(ReferenceData value) {
+        this.editValue = value;
         binder.readBean(value);
+        var dataProvider = DataProvider.ofCollection(value.getMetaDataFieldsList());
+        dataProvider.setFilter(v -> v.getChangeStatus() != ChangeStatus.DELETED);
+
+        fieldsGrid.setDataProvider(dataProvider);
+        setSelectedField(null);
     }
 
     public void getValue(ReferenceData value) throws ValidationException {

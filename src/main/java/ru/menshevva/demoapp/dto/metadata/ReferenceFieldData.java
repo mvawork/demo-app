@@ -1,12 +1,13 @@
 package ru.menshevva.demoapp.dto.metadata;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import ru.menshevva.demoapp.dto.ChangeStatus;
 
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ReferenceFieldData {
 
     private Long fieldId;
@@ -15,5 +16,7 @@ public class ReferenceFieldData {
     private Integer fieldLength;
     private Integer fieldOrder;
     private String fieldType;
+
+    private ChangeStatus changeStatus;
 
 }

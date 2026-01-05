@@ -8,4 +8,8 @@ import java.util.stream.Stream;
 public interface ReferenceSearchService {
 
     Stream<ReferenceData> fetch(Query<ReferenceData, ReferenceFilter> query);
+
+    void refresh();
+
+    int count(Query<ReferenceData, ReferenceFilter> query);
 }

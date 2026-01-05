@@ -12,8 +12,10 @@ public class FrontendConsts {
     public static final String PAGE_ADMIN_USER_LIST = "admin/user-list";
     public static final String PAGE_ADMIN_PRIVILEGE_LIST = "admin/privilege-list";
     public static final String PAGE_ADMIN_ROLE_LIST = "admin/role-list";
+    public static final String PAGE_ADMIN_METADATA_LIST = "admin/metadata";
 
     public static final String PAGE_CLIENT_LIST = "clients/list";
     public static final String PAGE_REFERENCES = "references";
+
 
 }

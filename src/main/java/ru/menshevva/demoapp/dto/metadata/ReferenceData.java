@@ -1,14 +1,14 @@
 package ru.menshevva.demoapp.dto.metadata;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ReferenceData {
     private Long referenceId;
     private String schemaName;

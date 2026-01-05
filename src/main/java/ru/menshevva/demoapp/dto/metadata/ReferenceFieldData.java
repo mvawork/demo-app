@@ -9,9 +9,11 @@ import lombok.Setter;
 @Builder
 public class ReferenceFieldData {
 
+    private Long fieldId;
     private String fieldName;
     private String fieldTitle;
     private Integer fieldLength;
     private Integer fieldOrder;
+    private String fieldType;
 
 }

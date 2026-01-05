@@ -7,6 +7,7 @@ import com.vaadin.flow.router.*;
 import jakarta.annotation.security.RolesAllowed;
 import ru.menshevva.demoapp.security.ApplicationRoles;
 import ru.menshevva.demoapp.ui.MainMenuLayout;
+import ru.menshevva.demoapp.ui.admin.metadata.MetaDataListView;
 import ru.menshevva.demoapp.ui.admin.roles.RoleListView;
 import ru.menshevva.demoapp.ui.admin.roles.PrivilegesListView;
 import ru.menshevva.demoapp.ui.admin.users.UserListView;
@@ -52,6 +53,12 @@ public class AdminLayout extends LitTemplate implements RouterLayout, AfterNavig
                 .id("privilege")
                 .title("Привилегии")
                 .url(RouteConfiguration.forApplicationScope().getUrl(PrivilegesListView.class))
+                .active(false)
+                .build());
+        result.add(MenuItem.builder()
+                .id("metadata")
+                .title("Метаданные")
+                .url(RouteConfiguration.forApplicationScope().getUrl(MetaDataListView.class))
                 .active(false)
                 .build());
         return result;

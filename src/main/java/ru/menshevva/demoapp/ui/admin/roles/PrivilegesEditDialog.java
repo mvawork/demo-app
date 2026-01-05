@@ -14,7 +14,7 @@ import java.math.BigInteger;
 
 @SpringComponent
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
-public class PrivilegesEditDialog extends Dialog  implements EditActionCallback {
+public class PrivilegesEditDialog extends Dialog implements EditActionCallback {
 
     private final PrivilegeCRUDService CRUDService;
     private final PrivilegesEditView editView;

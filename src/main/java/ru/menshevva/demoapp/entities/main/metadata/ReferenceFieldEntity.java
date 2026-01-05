@@ -14,10 +14,10 @@ public class ReferenceFieldEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SQ_DIC_REFERENCE_FIELD")
     @Column(name = "FIELD_ID")
-    private Integer fieldId;
+    private Long fieldId;
 
     @Column(name = "REFERENCE_ID")
-    private Integer referenceId;
+    private Long referenceId;
 
     @Column(name = "FIELD_NAME")
     private String fieldName;

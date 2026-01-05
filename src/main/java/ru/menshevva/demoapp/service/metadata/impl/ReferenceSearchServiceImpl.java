@@ -3,7 +3,9 @@ package ru.menshevva.demoapp.service.metadata.impl;
 import com.vaadin.flow.data.provider.Query;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.JoinType;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
 import ru.menshevva.demoapp.dto.metadata.ReferenceData;
 import ru.menshevva.demoapp.dto.metadata.ReferenceFieldData;
@@ -13,24 +15,67 @@ import ru.menshevva.demoapp.entities.main.metadata.ReferenceFieldEntity_;
 import ru.menshevva.demoapp.service.metadata.ReferenceFilter;
 import ru.menshevva.demoapp.service.metadata.ReferenceSearchService;
 
+import java.util.List;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
 @Slf4j
-public class ReferenceSearchServiceImpl implements ReferenceSearchService {
+public class ReferenceSearchServiceImpl implements ReferenceSearchService, InitializingBean {
 
 
     @PersistenceContext(name = "main")
     private EntityManager em;
 
+    private List<ReferenceData> referenceDataList;
+
+    private final ReadWriteLock lock = new ReentrantReadWriteLock();
+
 
     @Override
     public Stream<ReferenceData> fetch(Query<ReferenceData, ReferenceFilter> query) {
+        lock.readLock().lock();
+        try {
+            return referenceDataList.stream()
+                    .skip(query.getOffset())
+                    .limit(query.getLimit());
+        } finally {
+            lock.readLock().unlock();
+        }
+    }
+
+    @Override
+    public int count(Query<ReferenceData, ReferenceFilter> query) {
+        lock.readLock().lock();
+        try {
+            return referenceDataList.size();
+        } finally {
+            lock.readLock().unlock();
+        }
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        refresh();
+    }
+
+    @Override
+    public void refresh() {
+        lock.writeLock().lock();
+        try {
+            loadData();
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
+
+    private void loadData() {
         var cb = em.getCriteriaBuilder();
         var cq = cb.createTupleQuery();
         var root = cq.from(ReferenceEntity.class);
-        var joinField = root.join(ReferenceEntity_.referenceFieldEntities);
+        var joinField = root.join(ReferenceEntity_.referenceFieldEntities, JoinType.LEFT);
         cq.select(
                 cb.tuple(root.get(ReferenceEntity_.referenceId).alias(ReferenceEntity_.REFERENCE_ID),
                         root.get(ReferenceEntity_.schemaName).alias(ReferenceEntity_.SCHEMA_NAME),
@@ -50,7 +95,7 @@ public class ReferenceSearchServiceImpl implements ReferenceSearchService {
                         t.get(ReferenceEntity_.REFERENCE_ID, ReferenceEntity_.referenceId.getJavaType())
                 ));
 
-        return results.entrySet()
+        this.referenceDataList = results.entrySet()
                 .stream()
                 .map(entry -> {
                     var t = entry.getValue().getFirst();
@@ -72,7 +117,7 @@ public class ReferenceSearchServiceImpl implements ReferenceSearchService {
                     referenceData.setMetaDataFieldsList(fieldList);
                     return referenceData;
                 })
-                .toList()
-                .stream();
+                .toList();
+
     }
 }

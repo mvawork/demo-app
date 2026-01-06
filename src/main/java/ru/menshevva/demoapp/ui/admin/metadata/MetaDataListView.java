@@ -86,7 +86,7 @@ public class MetaDataListView extends VerticalLayout implements EditActionCallba
         this.dataGrid = new Grid<>();
         dataGrid.addColumn(ReferenceData::getSchemaName)
                 .setHeader("Схема");
-        dataGrid.addColumn(ReferenceData::getSchemaName)
+        dataGrid.addColumn(ReferenceData::getTableName)
                 .setHeader("Таблица");
         dataGrid.setDataProvider(dataProvider);
         dataGrid.addSelectionListener(selectionEvent -> setSelectedItem(selectionEvent.getFirstSelectedItem().orElse(null)));

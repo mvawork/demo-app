@@ -106,6 +106,7 @@ public class ReferenceSearchServiceImpl implements ReferenceSearchService, Initi
                             .schemaName(t.get(ReferenceEntity_.SCHEMA_NAME, ReferenceEntity_.schemaName.getJavaType()))
                             .tableName(t.get(ReferenceEntity_.TABLE_NAME, ReferenceEntity_.tableName.getJavaType()))
                             .tableSQL(t.get(ReferenceEntity_.TABLE_SQL, ReferenceEntity_.tableSql.getJavaType()))
+                            .changeStatus(ChangeStatus.UNCHANGED)
                             .build();
                     var fieldList = entry.getValue().stream()
                             .filter(v -> v.get(ReferenceFieldEntity_.FIELD_ID, ReferenceFieldEntity_.referenceId.getJavaType()) != null)

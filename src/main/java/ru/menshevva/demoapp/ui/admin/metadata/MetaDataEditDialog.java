@@ -7,6 +7,7 @@ import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
+import ru.menshevva.demoapp.dto.ChangeStatus;
 import ru.menshevva.demoapp.dto.metadata.ReferenceData;
 import ru.menshevva.demoapp.service.metadata.MetaDataCRUDservice;
 import ru.menshevva.demoapp.ui.components.EditActionCallback;
@@ -42,9 +43,11 @@ public class MetaDataEditDialog extends Dialog implements EditActionCallback {
         this.editActionCallback = editActionCallback;
         if (referenceData == null) {
             this.value = new ReferenceData();
+            this.value.setChangeStatus(ChangeStatus.ADD);
             this.value.setMetaDataFieldsList(new ArrayList<>());
         } else {
             this.value = referenceData;
+            this.value.setChangeStatus(ChangeStatus.MODIFIED);
         }
         editView.setValue(this.value);
         open();

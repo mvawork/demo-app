@@ -5,7 +5,7 @@ spring:
     password: ${APP_DB_PASSWORD}
   jpa:
     hibernate:
-     ddl-auto: update
+     ddl-auto: none
 
 second:
   datasource:

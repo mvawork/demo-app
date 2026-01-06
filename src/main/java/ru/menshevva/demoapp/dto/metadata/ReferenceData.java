@@ -1,6 +1,7 @@
 package ru.menshevva.demoapp.dto.metadata;
 
 import lombok.*;
+import ru.menshevva.demoapp.dto.ChangeStatus;
 
 import java.util.List;
 
@@ -15,5 +16,7 @@ public class ReferenceData {
     private String tableName;
     private String tableSQL;
     private List<ReferenceFieldData> metaDataFieldsList;
+
+    private ChangeStatus changeStatus;
 
 }

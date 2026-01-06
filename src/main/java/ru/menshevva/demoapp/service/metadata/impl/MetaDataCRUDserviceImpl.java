@@ -2,7 +2,6 @@ package ru.menshevva.demoapp.service.metadata.impl;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.criteria.CriteriaQuery;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,9 +12,10 @@ import ru.menshevva.demoapp.entities.main.metadata.ReferenceEntity;
 import ru.menshevva.demoapp.entities.main.metadata.ReferenceEntity_;
 import ru.menshevva.demoapp.entities.main.metadata.ReferenceFieldEntity;
 import ru.menshevva.demoapp.entities.main.metadata.ReferenceFieldEntity_;
+import ru.menshevva.demoapp.exception.EAppException;
 import ru.menshevva.demoapp.service.metadata.MetaDataCRUDservice;
 
-import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -30,9 +30,9 @@ public class MetaDataCRUDserviceImpl implements MetaDataCRUDservice {
         if (value == null) {
             throw new IllegalArgumentException("value is null");
         }
-        if (value.getReferenceId() == null) {
+        if (value.getChangeStatus() == ChangeStatus.ADD) {
             add(value);
-        } else {
+        } else if (value.getChangeStatus() == ChangeStatus.MODIFIED) {
             update(value);
         }
     }
@@ -45,10 +45,22 @@ public class MetaDataCRUDserviceImpl implements MetaDataCRUDservice {
         cu.set(ReferenceEntity_.tableName, value.getTableName());
         cu.set(ReferenceEntity_.tableSql, value.getTableSQL());
         cu.where(cb.equal(root.get(ReferenceEntity_.referenceId), value.getReferenceId()));
+        entityManager.createQuery(cu).executeUpdate();
         saveFields(value);
     }
 
     private void saveFields(ReferenceData value) {
+        if (value.getChangeStatus() == ChangeStatus.ADD) {
+            Optional<ReferenceFieldData> errStateFields = value.getMetaDataFieldsList()
+                    .stream()
+                    .filter(v -> v.getChangeStatus() != ChangeStatus.ADD)
+                    .findAny();
+            errStateFields.ifPresent(v -> {
+                var errMsg = "Не верный статус поля %s".formatted(v.getFieldName());
+                log.error(errMsg);
+                throw new EAppException(errMsg);
+            });
+        }
         value.getMetaDataFieldsList()
                 .stream()
                 .filter(v -> v.getChangeStatus() == ChangeStatus.DELETED && v.getFieldId() != null)
@@ -105,19 +117,7 @@ public class MetaDataCRUDserviceImpl implements MetaDataCRUDservice {
         e.setTableSql(value.getTableSQL());
         entityManager.persist(e);
         value.setReferenceId(e.getReferenceId());
-        if (value.getMetaDataFieldsList() != null) {
-            value.getMetaDataFieldsList().forEach(metaDataField -> {
-                var f = new ReferenceFieldEntity();
-                f.setReferenceId(value.getReferenceId());
-                f.setFieldName(metaDataField.getFieldName());
-                f.setFieldTitle(metaDataField.getFieldTitle());
-                f.setFieldLength(metaDataField.getFieldLength());
-                f.setFieldOrder(metaDataField.getFieldOrder());
-                f.setFieldType(metaDataField.getFieldType());
-                entityManager.persist(f);
-                metaDataField.setFieldId(f.getFieldId());
-            });
-        }
+        saveFields(value);
     }
 
     @Override

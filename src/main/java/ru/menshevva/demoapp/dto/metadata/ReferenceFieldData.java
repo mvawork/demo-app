@@ -15,7 +15,7 @@ public class ReferenceFieldData {
     private String fieldTitle;
     private Integer fieldLength;
     private Integer fieldOrder;
-    private String fieldType;
+    private ReferenceFieldType fieldType;
 
     private ChangeStatus changeStatus;
 

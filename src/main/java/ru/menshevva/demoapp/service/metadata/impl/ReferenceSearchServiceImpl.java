@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import ru.menshevva.demoapp.dto.ChangeStatus;
 import ru.menshevva.demoapp.dto.metadata.ReferenceData;
 import ru.menshevva.demoapp.dto.metadata.ReferenceFieldData;
+import ru.menshevva.demoapp.dto.metadata.ReferenceFieldType;
 import ru.menshevva.demoapp.entities.main.metadata.ReferenceEntity;
 import ru.menshevva.demoapp.entities.main.metadata.ReferenceEntity_;
 import ru.menshevva.demoapp.entities.main.metadata.ReferenceFieldEntity_;
@@ -116,6 +117,7 @@ public class ReferenceSearchServiceImpl implements ReferenceSearchService, Initi
                                     .fieldTitle(v.get(ReferenceFieldEntity_.FIELD_TITLE, ReferenceFieldEntity_.fieldTitle.getJavaType()))
                                     .fieldLength(v.get(ReferenceFieldEntity_.FIELD_LENGTH, ReferenceFieldEntity_.fieldLength.getJavaType()))
                                     .fieldOrder(v.get(ReferenceFieldEntity_.FIELD_ORDER, ReferenceFieldEntity_.fieldOrder.getJavaType()))
+                                    .fieldType(ReferenceFieldType.getForName(v.get(ReferenceFieldEntity_.FIELD_TYPE, ReferenceFieldEntity_.fieldType.getJavaType())))
                                     .changeStatus(ChangeStatus.UNCHANGED)
                                     .build()
                             )

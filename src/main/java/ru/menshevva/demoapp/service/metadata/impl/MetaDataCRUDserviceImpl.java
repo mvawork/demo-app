@@ -83,7 +83,7 @@ public class MetaDataCRUDserviceImpl implements MetaDataCRUDservice {
         e.setFieldTitle(v.getFieldTitle());
         e.setFieldLength(v.getFieldLength());
         e.setFieldOrder(v.getFieldOrder());
-        e.setFieldType(v.getFieldType());
+        e.setFieldType(v.getFieldType().name() == null ? null : v.getFieldType().name());
         entityManager.persist(e);
         v.setFieldId(e.getFieldId());
     }
@@ -96,7 +96,7 @@ public class MetaDataCRUDserviceImpl implements MetaDataCRUDservice {
         cu.set(root.get(ReferenceFieldEntity_.fieldTitle), referenceFieldData.getFieldTitle());
         cu.set(root.get(ReferenceFieldEntity_.fieldLength), referenceFieldData.getFieldLength());
         cu.set(root.get(ReferenceFieldEntity_.fieldOrder), referenceFieldData.getFieldOrder());
-        cu.set(root.get(ReferenceFieldEntity_.fieldType), referenceFieldData.getFieldType());
+        cu.set(root.get(ReferenceFieldEntity_.fieldType), referenceFieldData.getFieldType() == null ? null : referenceFieldData.getFieldType().name());
         cu.where(cb.equal(root.get(ReferenceFieldEntity_.fieldId), referenceFieldData.getFieldId()));
         entityManager.createQuery(cu).executeUpdate();
     }

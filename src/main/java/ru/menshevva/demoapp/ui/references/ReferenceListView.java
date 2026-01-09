@@ -100,16 +100,15 @@ public class ReferenceListView extends HorizontalLayout implements EditActionCal
     }
 
     private void deleteReferenceData(ClickEvent<Button> buttonClickEvent) {
-
+        autoEditReferenceDataEditDialog.deleteValue(referenceData, selectedReferenceData, this);
     }
 
     private void editReferenceData(ClickEvent<Button> buttonClickEvent) {
         autoEditReferenceDataEditDialog.editValue(referenceData, selectedReferenceData, this);
-
     }
 
     private void addReferenceData(ClickEvent<Button> buttonClickEvent) {
-
+        autoEditReferenceDataEditDialog.editValue(referenceData, null, this);
     }
 
     private void initReferenceDataGrid(ReferenceData referenceData) {
@@ -123,6 +122,9 @@ public class ReferenceListView extends HorizontalLayout implements EditActionCal
                     .forEach(v -> {
                         referenceDataGrid.addColumn(f -> {
                                     var o = f.get(v.getFieldName());
+                                    if (o == null) {
+                                        return "";
+                                    }
                                     return switch (o) {
                                         case String stringValue -> stringValue;
                                         case Integer integerValue -> Integer.toString(integerValue);

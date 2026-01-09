@@ -59,7 +59,7 @@ public class ReferenceSearchServiceImpl implements ReferenceSearchService, Initi
     }
 
     @Override
-    public void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet() {
         refresh();
     }
 
@@ -86,6 +86,7 @@ public class ReferenceSearchServiceImpl implements ReferenceSearchService, Initi
                         joinField.get(ReferenceFieldEntity_.fieldId).alias(ReferenceFieldEntity_.FIELD_ID),
                         joinField.get(ReferenceFieldEntity_.fieldName).alias(ReferenceFieldEntity_.FIELD_NAME),
                         joinField.get(ReferenceFieldEntity_.fieldTitle).alias(ReferenceFieldEntity_.FIELD_TITLE),
+                        joinField.get(ReferenceFieldEntity_.fieldKey).alias(ReferenceFieldEntity_.FIELD_KEY),
                         joinField.get(ReferenceFieldEntity_.fieldOrder).alias(ReferenceFieldEntity_.FIELD_ORDER),
                         joinField.get(ReferenceFieldEntity_.fieldType).alias(ReferenceFieldEntity_.FIELD_TYPE),
                         joinField.get(ReferenceFieldEntity_.fieldLength).alias(ReferenceFieldEntity_.FIELD_LENGTH)
@@ -118,6 +119,7 @@ public class ReferenceSearchServiceImpl implements ReferenceSearchService, Initi
                                     .fieldLength(v.get(ReferenceFieldEntity_.FIELD_LENGTH, ReferenceFieldEntity_.fieldLength.getJavaType()))
                                     .fieldOrder(v.get(ReferenceFieldEntity_.FIELD_ORDER, ReferenceFieldEntity_.fieldOrder.getJavaType()))
                                     .fieldType(ReferenceFieldType.getForName(v.get(ReferenceFieldEntity_.FIELD_TYPE, ReferenceFieldEntity_.fieldType.getJavaType())))
+                                    .fieldKey(v.get(ReferenceFieldEntity_.FIELD_KEY, ReferenceFieldEntity_.fieldKey.getJavaType()))
                                     .changeStatus(ChangeStatus.UNCHANGED)
                                     .build()
                             )

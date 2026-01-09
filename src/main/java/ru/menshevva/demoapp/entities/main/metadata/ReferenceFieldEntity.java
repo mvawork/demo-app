@@ -28,6 +28,9 @@ public class ReferenceFieldEntity {
     @Column(name = "FIELD_TYPE")
     private String fieldType;
 
+    @Column(name = "FIELD_KEY")
+    private Boolean fieldKey;
+
     @Column(name = "FIELD_LENGTH")
     private Integer fieldLength;
 

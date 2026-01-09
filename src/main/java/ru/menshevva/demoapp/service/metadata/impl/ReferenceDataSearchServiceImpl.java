@@ -8,6 +8,7 @@ import ru.menshevva.demoapp.dto.metadata.ReferenceData;
 import ru.menshevva.demoapp.service.metadata.ReferenceDataSearchService;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -25,7 +26,7 @@ public class ReferenceDataSearchServiceImpl implements ReferenceDataSearchServic
     @Override
     public Stream<Map<String, ?>> search(ReferenceData referenceData, Query<Map<String, ?>, Map<String, ?>> query) {
         if (referenceData == null) {
-            return  Stream.empty();
+            return Stream.empty();
         }
         var sql = "%s".formatted(referenceData.getTableSQL());
         var result = jdbcTemplate.query(sql, (rs, rowNum) -> {
@@ -38,8 +39,14 @@ public class ReferenceDataSearchServiceImpl implements ReferenceDataSearchServic
                                 case FIELD_TYPE_DOUBLE -> rs.getDouble(v.getFieldName());
                                 case FIELD_TYPE_LONG -> rs.getLong(v.getFieldName());
                                 case FIELD_TYPE_BOOLEAN -> rs.getBoolean(v.getFieldName());
-                                case FIELD_TYPE_DATE -> rs.getDate(v.getFieldName());
-                                case FIELD_TYPE_TIMESTAMP -> rs.getTimestamp(v.getFieldName());
+                                case FIELD_TYPE_DATE -> {
+                                    var dateValue = rs.getDate(v.getFieldName());
+                                    yield dateValue == null ? null : rs.getDate(v.getFieldName()).toLocalDate();
+                                }
+                                case FIELD_TYPE_TIMESTAMP -> {
+                                    var dateTimeValue = rs.getTimestamp(v.getFieldName());
+                                    yield dateTimeValue == null ? null : rs.getTimestamp(v.getFieldName()).toLocalDateTime();
+                                }
                                 case FIELD_TYPE_BIGDECIMAL -> rs.getBigDecimal(v.getFieldName());
                                 case FIELD_TYPE_BYTE -> rs.getBytes(v.getFieldName());
                                 case FIELD_TYPE_FLOAT -> rs.getFloat(v.getFieldName());
@@ -65,7 +72,13 @@ public class ReferenceDataSearchServiceImpl implements ReferenceDataSearchServic
             return 0;
         }
         var sql = "Select count(*) from (%s)".formatted(referenceData.getTableSQL());
-        var count = jdbcTemplate.queryForObject(sql, Integer.class);
-        return count != null ? count : 0;
+        try {
+
+            var count = jdbcTemplate.queryForObject(sql, Integer.class);
+            return count != null ? count : 0;
+        } catch (RuntimeException e) {
+            log.warn("Ошибка выполнения запрос {}", sql);
+            return 0;
+        }
     }
 }

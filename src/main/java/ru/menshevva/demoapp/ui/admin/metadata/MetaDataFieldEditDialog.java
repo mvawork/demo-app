@@ -27,6 +27,12 @@ public class MetaDataFieldEditDialog extends Dialog implements EditActionCallbac
         var fieldTitle = new TextField("Наименование поля");
         binder.forField(fieldTitle)
                 .bind(ReferenceFieldData::getFieldTitle, ReferenceFieldData::setFieldTitle);
+        var fieldKey = new ComboBox<Boolean>("Ключевое поле");
+        fieldKey.setItems(true, false);
+        fieldKey.setItemLabelGenerator(b -> b ? "Да" : "Нет");
+        binder.forField(fieldKey)
+                .bind(ReferenceFieldData::getFieldKey, ReferenceFieldData::setFieldKey);
+
         var fieldType = new ComboBox<ReferenceFieldType>("Тип поля");
         fieldType.setItems(ReferenceFieldType.values());
         fieldType.setItemLabelGenerator(ReferenceFieldType::getTypeName);
@@ -54,7 +60,7 @@ public class MetaDataFieldEditDialog extends Dialog implements EditActionCallbac
                             }
                         }
                 );
-        editView.add(fieldName, fieldTitle, fieldType, fieldLength, fieldOrder);
+        editView.add(fieldName, fieldTitle, fieldKey, fieldType, fieldLength, fieldOrder);
         content.setWidth(400, Unit.PIXELS);
         content.setHeight(400, Unit.PIXELS);
         content.add(editView, new EditActionComponent(this));

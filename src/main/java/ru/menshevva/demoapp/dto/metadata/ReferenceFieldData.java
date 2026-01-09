@@ -16,7 +16,7 @@ public class ReferenceFieldData {
     private Integer fieldLength;
     private Integer fieldOrder;
     private ReferenceFieldType fieldType;
-
+    private Boolean fieldKey;
     private ChangeStatus changeStatus;
 
 }

@@ -14,9 +14,7 @@ public enum ReferenceFieldType {
     FIELD_TYPE_FLOAT("Дробное число float"), // Число с плавающей точкой (float)
     FIELD_TYPE_SHORT("Короткое целое"), // Короткое целое число (short)
     FIELD_TYPE_CHAR("Символ"),          // Символьный тип (char)
-    FIELD_TYPE_BYTE_ARRAY("Массив байтов"), // Массив байтов (byte[])
-    FIELD_TYPE_OBJECT("Объект"),        // Объектный тип
-    FIELD_TYPE_UNKNOWN("Неизвестный");  // Неизвестный тип
+    ;  // Неизвестный тип
 
     private final String typeName;
 

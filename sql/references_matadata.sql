@@ -29,6 +29,7 @@ create table metadata.dic_reference_field
     reference_id bigint not null,
     field_name  varchar(255),
     field_title varchar(255),
+    field_key   boolean,
     field_type  varchar(255),
     field_length integer,
     field_order integer,
@@ -44,6 +45,8 @@ comment on column metadata.dic_reference_field.field_id is 'Идентифика
 comment on column metadata.dic_reference_field.reference_id is 'Идентификатор описания';
 
 comment on column metadata.dic_reference_field.field_name is 'Наименование поля';
+
+comment on column metadata.dic_reference_field.field_key is 'Ключевое поле';
 
 comment on column metadata.dic_reference_field.field_title is 'Заголовок поля';
 

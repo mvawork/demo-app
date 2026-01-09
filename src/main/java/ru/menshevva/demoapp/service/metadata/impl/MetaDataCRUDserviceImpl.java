@@ -81,6 +81,7 @@ public class MetaDataCRUDserviceImpl implements MetaDataCRUDservice {
         e.setReferenceId(referenceId);
         e.setFieldName(v.getFieldName());
         e.setFieldTitle(v.getFieldTitle());
+        e.setFieldKey(v.getFieldKey());
         e.setFieldLength(v.getFieldLength());
         e.setFieldOrder(v.getFieldOrder());
         e.setFieldType(v.getFieldType().name() == null ? null : v.getFieldType().name());
@@ -94,6 +95,7 @@ public class MetaDataCRUDserviceImpl implements MetaDataCRUDservice {
         var root = cu.from(ReferenceFieldEntity.class);
         cu.set(root.get(ReferenceFieldEntity_.fieldName), referenceFieldData.getFieldName());
         cu.set(root.get(ReferenceFieldEntity_.fieldTitle), referenceFieldData.getFieldTitle());
+        cu.set(root.get(ReferenceFieldEntity_.fieldKey), referenceFieldData.getFieldKey());
         cu.set(root.get(ReferenceFieldEntity_.fieldLength), referenceFieldData.getFieldLength());
         cu.set(root.get(ReferenceFieldEntity_.fieldOrder), referenceFieldData.getFieldOrder());
         cu.set(root.get(ReferenceFieldEntity_.fieldType), referenceFieldData.getFieldType() == null ? null : referenceFieldData.getFieldType().name());

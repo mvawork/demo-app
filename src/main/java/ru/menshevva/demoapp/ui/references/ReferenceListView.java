@@ -39,7 +39,10 @@ public class ReferenceListView extends HorizontalLayout implements EditActionCal
     private final ReferenceDataSearchService referenceDataSearchService;
     private final ConfigurableFilterDataProvider<Map<String, ?>, Void, Map<String, ?>> referenceDataProvider;
     private final AutoEditReferenceDataEditDialog autoEditReferenceDataEditDialog;
-    private  Map<String, ?> selectedReferenceData;
+    private final Button addReferenceButton;
+    private final Button editReferenceButton;
+    private final Button deleteReferenceButton;
+    private Map<String, ?> selectedReferenceData;
 
     private ReferenceData referenceData;
 
@@ -62,42 +65,58 @@ public class ReferenceListView extends HorizontalLayout implements EditActionCal
         var metaDataGrid = new Grid<ReferenceData>();
         metaDataGrid.addColumn(ReferenceData::getTableName);
         metaDataGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
-        metaDataGrid.addSelectionListener(event -> {
-            initReferenceDataGrid(event.getFirstSelectedItem().orElse(null));
-        });
+        metaDataGrid.addSelectionListener(event -> initReferenceDataGrid(event.getFirstSelectedItem().orElse(null)));
         metaDataGrid.setDataProvider(dataProvider);
         var leftBlock = new VerticalLayout(metaDataGrid);
         leftBlock.setWidth(300, Unit.PIXELS);
         //
         var referenceDataAction = new HorizontalLayout();
         referenceDataAction.setWidthFull();
-        var addReferenceButton = new Button("Добавить");
+        this.addReferenceButton = new Button("Добавить");
         addReferenceButton.addClickListener(this::addReferenceData);
-        var editReferenceButton = new Button("Изменить");
+        this.editReferenceButton = new Button("Изменить");
         editReferenceButton.addClickListener(this::editReferenceData);
-        var deleteReferenceButton =  new Button("Удалить");
+        this.deleteReferenceButton = new Button("Удалить");
         deleteReferenceButton.addClickListener(this::deleteReferenceData);
         var leftReferenceDataActionBlock = new HorizontalLayout();
         leftReferenceDataActionBlock.add(addReferenceButton, editReferenceButton, deleteReferenceButton);
-        var rightReferenceDataActionBlock = new HorizontalLayout();
+        var refreshReferenceButton = new Button("Обновить");
+        refreshReferenceButton.addClickListener(event -> ok());
+        var clearReferenceButton = new Button("Очистить");
+        clearReferenceButton.addClickListener(event -> {
+            clearFilter();
+        });
+
+        var rightReferenceDataActionBlock = new HorizontalLayout(refreshReferenceButton, clearReferenceButton);
+        rightReferenceDataActionBlock.setJustifyContentMode(JustifyContentMode.END);
         referenceDataAction.add(leftReferenceDataActionBlock, rightReferenceDataActionBlock);
+        referenceDataAction.setWidthFull();
+        referenceDataAction.setFlexGrow(1, rightReferenceDataActionBlock);
         //
         this.referenceDataGrid = new Grid<>();
         referenceDataGrid.setDataProvider(referenceDataProvider);
-        //referenceDataGrid.setSizeFull();
         referenceDataGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
         referenceDataGrid.addSelectionListener(event -> {
-            this.selectedReferenceData = event.getFirstSelectedItem().orElse(null);
-            editReferenceButton.setEnabled(selectedReferenceData != null);
-            deleteReferenceButton.setEnabled(selectedReferenceData != null);
+            setSelectedReferenceData(event.getFirstSelectedItem().orElse(null));
         });
-
+        setSelectedReferenceData(null);
         var rightBlock = new VerticalLayout(referenceDataAction, referenceDataGrid);
         rightBlock.setSizeFull();
         rightBlock.setFlexGrow(1, referenceDataGrid);
         add(leftBlock, rightBlock);
         setFlexGrow(1, rightBlock);
         setSizeFull();
+
+    }
+
+    private void clearFilter() {
+        ok();
+    }
+
+    private void setSelectedReferenceData(Map<String, ?> value) {
+        this.selectedReferenceData = value;
+        editReferenceButton.setEnabled(selectedReferenceData != null);
+        deleteReferenceButton.setEnabled(selectedReferenceData != null);
 
     }
 

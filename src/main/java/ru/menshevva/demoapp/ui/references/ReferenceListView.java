@@ -84,7 +84,7 @@ public class ReferenceListView extends HorizontalLayout implements EditActionCal
         //
         this.referenceDataGrid = new Grid<>();
         referenceDataGrid.setDataProvider(referenceDataProvider);
-        referenceDataGrid.setSizeFull();
+        //referenceDataGrid.setSizeFull();
         referenceDataGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
         referenceDataGrid.addSelectionListener(event -> {
             this.selectedReferenceData = event.getFirstSelectedItem().orElse(null);
@@ -93,6 +93,8 @@ public class ReferenceListView extends HorizontalLayout implements EditActionCal
         });
 
         var rightBlock = new VerticalLayout(referenceDataAction, referenceDataGrid);
+        rightBlock.setSizeFull();
+        rightBlock.setFlexGrow(1, referenceDataGrid);
         add(leftBlock, rightBlock);
         setFlexGrow(1, rightBlock);
         setSizeFull();

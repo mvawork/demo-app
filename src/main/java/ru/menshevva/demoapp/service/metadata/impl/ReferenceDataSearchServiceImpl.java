@@ -3,6 +3,7 @@ package ru.menshevva.demoapp.service.metadata.impl;
 import com.vaadin.flow.data.provider.Query;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
 import ru.menshevva.demoapp.dto.metadata.ReferenceData;
 import ru.menshevva.demoapp.service.metadata.ReferenceDataSearchService;
@@ -17,9 +18,9 @@ import java.util.stream.Stream;
 @Slf4j
 public class ReferenceDataSearchServiceImpl implements ReferenceDataSearchService {
 
-    private final JdbcTemplate jdbcTemplate;
+    private final NamedParameterJdbcTemplate jdbcTemplate;
 
-    public ReferenceDataSearchServiceImpl(JdbcTemplate jdbcTemplate) {
+    public ReferenceDataSearchServiceImpl(NamedParameterJdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -28,8 +29,11 @@ public class ReferenceDataSearchServiceImpl implements ReferenceDataSearchServic
         if (referenceData == null) {
             return Stream.empty();
         }
-        var sql = "%s".formatted(referenceData.getTableSQL());
-        var result = jdbcTemplate.query(sql, (rs, rowNum) -> {
+        var sql = "%s OFFSET :offset LIMIT :limit ".formatted(referenceData.getTableSQL());
+        Map<String, Object> params = new HashMap<>();
+        params.put("limit", query.getLimit());
+        params.put("offset", query.getOffset());
+        var result = jdbcTemplate.query(sql, params, (rs, rowNum) -> {
             Map<String, Object> m = new HashMap<>();
             referenceData.getMetaDataFieldsList().forEach(v -> {
                         try {
@@ -73,8 +77,8 @@ public class ReferenceDataSearchServiceImpl implements ReferenceDataSearchServic
         }
         var sql = "Select count(*) from (%s)".formatted(referenceData.getTableSQL());
         try {
-
-            var count = jdbcTemplate.queryForObject(sql, Integer.class);
+            var params = new HashMap<String, Object>();
+            var count = jdbcTemplate.queryForObject(sql, params, Integer.class);
             return count != null ? count : 0;
         } catch (RuntimeException e) {
             log.warn("Ошибка выполнения запрос {}", sql);

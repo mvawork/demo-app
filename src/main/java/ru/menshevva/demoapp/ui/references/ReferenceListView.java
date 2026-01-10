@@ -4,13 +4,16 @@ import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.PermitAll;
+import lombok.extern.slf4j.Slf4j;
 import ru.menshevva.demoapp.dto.metadata.ReferenceData;
 import ru.menshevva.demoapp.dto.metadata.ReferenceFieldData;
 import ru.menshevva.demoapp.service.metadata.ReferenceDataSearchService;
@@ -23,7 +26,9 @@ import ru.menshevva.demoapp.ui.components.EditActionCallback;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Map;
 
 import static ru.menshevva.demoapp.ui.FrontendConsts.TITLE_PAGE_REFERENCES;
@@ -31,6 +36,7 @@ import static ru.menshevva.demoapp.ui.FrontendConsts.TITLE_PAGE_REFERENCES;
 @PermitAll
 @PageTitle(TITLE_PAGE_REFERENCES)
 @Route(value = FrontendConsts.PAGE_REFERENCES, layout = MainMenuLayout.class)
+@Slf4j
 public class ReferenceListView extends HorizontalLayout implements EditActionCallback {
 
     private final ReferenceSearchService searchService;
@@ -42,9 +48,11 @@ public class ReferenceListView extends HorizontalLayout implements EditActionCal
     private final Button addReferenceButton;
     private final Button editReferenceButton;
     private final Button deleteReferenceButton;
+
     private Map<String, ?> selectedReferenceData;
 
     private ReferenceData referenceData;
+    private final Map<String, TextField> filters = new HashMap<>();
 
     public ReferenceListView(ReferenceSearchService searchService,
                              ReferenceDataSearchService referenceDataSearchService,
@@ -80,20 +88,22 @@ public class ReferenceListView extends HorizontalLayout implements EditActionCal
         deleteReferenceButton.addClickListener(this::deleteReferenceData);
         var leftReferenceDataActionBlock = new HorizontalLayout();
         leftReferenceDataActionBlock.add(addReferenceButton, editReferenceButton, deleteReferenceButton);
-        var refreshReferenceButton = new Button("Обновить");
-        refreshReferenceButton.addClickListener(event -> ok());
+        var searchReferenceButton = new Button("Найти");
+        searchReferenceButton.addClickListener(event -> ok());
         var clearReferenceButton = new Button("Очистить");
         clearReferenceButton.addClickListener(event -> {
             clearFilter();
         });
 
-        var rightReferenceDataActionBlock = new HorizontalLayout(refreshReferenceButton, clearReferenceButton);
+        var rightReferenceDataActionBlock = new HorizontalLayout(searchReferenceButton, clearReferenceButton);
         rightReferenceDataActionBlock.setJustifyContentMode(JustifyContentMode.END);
         referenceDataAction.add(leftReferenceDataActionBlock, rightReferenceDataActionBlock);
         referenceDataAction.setWidthFull();
         referenceDataAction.setFlexGrow(1, rightReferenceDataActionBlock);
         //
         this.referenceDataGrid = new Grid<>();
+
+
         referenceDataGrid.setDataProvider(referenceDataProvider);
         referenceDataGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
         referenceDataGrid.addSelectionListener(event -> {
@@ -110,6 +120,12 @@ public class ReferenceListView extends HorizontalLayout implements EditActionCal
     }
 
     private void clearFilter() {
+        filters.forEach((s, v) -> {
+                    if (!v.getValue().isEmpty()) {
+                        v.clear();
+                    }
+                }
+        );
         ok();
     }
 
@@ -135,13 +151,16 @@ public class ReferenceListView extends HorizontalLayout implements EditActionCal
     private void initReferenceDataGrid(ReferenceData referenceData) {
         this.referenceData = referenceData;
         referenceDataGrid.removeAllColumns();
+        referenceDataGrid.removeAllHeaderRows();
+        filters.clear();
         if (referenceData != null) {
+            final HeaderRow[] referenceDataGridFilterRow = {null};
             referenceData
                     .getMetaDataFieldsList()
                     .stream()
                     .sorted(Comparator.comparingInt(ReferenceFieldData::getFieldOrder))
                     .forEach(v -> {
-                        referenceDataGrid.addColumn(f -> {
+                        var column = referenceDataGrid.addColumn(f -> {
                                     var o = f.get(v.getFieldName());
                                     if (o == null) {
                                         return "";
@@ -163,7 +182,18 @@ public class ReferenceListView extends HorizontalLayout implements EditActionCal
                                 .setHeader(v.getFieldTitle())
                                 .setKey(v.getFieldName())
                                 .setWidth("%d%s".formatted(v.getFieldLength(), Unit.PIXELS));
+
+                        var filterField = new TextField();
+                        filterField.setWidth("100%");
+                        filterField.setPlaceholder("Фильтр по " + v.getFieldName());
+
+                        if (referenceDataGridFilterRow[0] == null) {
+                            referenceDataGridFilterRow[0] = referenceDataGrid.appendHeaderRow();
+                        }
+                        referenceDataGridFilterRow[0].getCell(column).setComponent(filterField);
+                        filters.put(v.getFieldName(), filterField);
                     });
+
         }
         referenceDataGrid.getDataProvider().refreshAll();
     }
@@ -171,8 +201,45 @@ public class ReferenceListView extends HorizontalLayout implements EditActionCal
     @Override
     public void ok() {
         referenceDataGrid.deselectAll();
-        //referenceDataProvider.setFilter(buildQueryFilter());
+        referenceDataProvider.setFilter(buildQueryFilter());
         referenceDataProvider.refreshAll();
+    }
+
+    private Map<String, ?> buildQueryFilter() {
+        if (referenceData == null) {
+            return Collections.emptyMap();
+        }
+        var params = new HashMap<String, Object>();
+        filters.forEach((s, v) -> {
+                    if (!v.getValue().isEmpty()) {
+                        referenceData.getMetaDataFieldsList()
+                                .stream()
+                                .filter(f -> f.getFieldName().equals(s)).findFirst()
+                                .ifPresent(f -> {
+                                    try {
+                                        var o = switch (f.getFieldType()) {
+                                            case FIELD_TYPE_STRING -> v.getValue();
+                                            case FIELD_TYPE_LONG -> Long.parseLong(v.getValue());
+                                            case FIELD_TYPE_INTEGER -> Integer.parseInt(v.getValue());
+                                            case FIELD_TYPE_SHORT -> Short.parseShort(v.getValue());
+                                            case FIELD_TYPE_BYTE -> Byte.parseByte(v.getValue());
+                                            case FIELD_TYPE_CHAR -> v.getValue().charAt(0);
+                                            case FIELD_TYPE_DATE -> LocalDate.parse(v.getValue());
+                                            case FIELD_TYPE_TIMESTAMP -> LocalDateTime.parse(v.getValue());
+                                            case FIELD_TYPE_FLOAT -> Float.parseFloat(v.getValue());
+                                            case FIELD_TYPE_DOUBLE -> Double.parseDouble(v.getValue());
+                                            case FIELD_TYPE_BOOLEAN -> Boolean.parseBoolean(v.getValue());
+                                            case FIELD_TYPE_BIGDECIMAL -> new BigDecimal(v.getValue());
+                                        };
+                                        params.put(f.getFieldName(), o);
+                                    } catch (RuntimeException ignore) {
+                                    }
+                                });
+
+                    }
+                }
+        );
+        return params;
     }
 
 }

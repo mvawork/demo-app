@@ -1,5 +1,8 @@
 package ru.menshevva.demoapp.ui.references;
 
+import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.HasValue;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -58,49 +61,54 @@ public class AutoEditReferenceDataEditDialog extends Dialog implements EditActio
                     .stream()
                     .sorted(Comparator.comparingInt(ReferenceFieldData::getFieldOrder))
                     .forEach(f -> {
-                        var editField = new TextField(f.getFieldTitle());
-                        binder.forField(editField)
-                                .bind((b) -> {
-                                    var o = b.get(f.getFieldName());
-                                    if (o == null) {
-                                        return "";
-                                    }
-                                    return switch (o) {
-                                        case String stringValue -> stringValue;
-                                        case Integer integerValue -> Integer.toString(integerValue);
-                                        case Long longValue -> Long.toString(longValue);
-                                        case Double doubleValue -> Double.toString(doubleValue);
-                                        case Boolean booleanValue -> Boolean.toString(booleanValue);
-                                        case LocalDate localDateValue -> localDateValue.toString();
-                                        case LocalDateTime localDateTimeValue -> localDateTimeValue.toString();
-                                        case BigDecimal bigDecimalValue -> bigDecimalValue.toString();
-                                        case Byte byteValue -> byteValue.toString();
-                                        case Float floatValue -> floatValue.toString();
-                                        default -> "";
-                                    };
-                                }, (b, t) -> {
-                                    Object o = null;
-                                    if (t != null && !t.isEmpty()) {
-                                        o = switch (f.getFieldType()) {
-                                            case FIELD_TYPE_STRING -> t;
-                                            case FIELD_TYPE_INTEGER -> Integer.parseInt(t);
-                                            case FIELD_TYPE_DOUBLE -> Double.parseDouble(t);
-                                            case FIELD_TYPE_LONG -> Long.parseLong(t);
-                                            case FIELD_TYPE_BOOLEAN -> Boolean.parseBoolean(t);
-                                            case FIELD_TYPE_DATE -> LocalDate.parse(t);
-                                            case FIELD_TYPE_TIMESTAMP -> LocalDateTime.parse(t);
-                                            case FIELD_TYPE_BIGDECIMAL -> BigDecimal.valueOf(Double.parseDouble(t));
-                                            case FIELD_TYPE_BYTE -> Byte.parseByte(t);
-                                            case FIELD_TYPE_FLOAT -> Float.parseFloat(t);
-                                            case FIELD_TYPE_SHORT -> Short.parseShort(t);
-                                            case FIELD_TYPE_CHAR -> t.charAt(0);
-                                        };
-                                    }
-                                    b.put(f.getFieldName(), o);
-                                }
+                        if (false) {
+                            var comboBoxField = new ComboBox<Map.Entry<String, String>>(f.getFieldTitle());
+                        } else {
+                            var textField = new TextField(f.getFieldTitle());
 
-                        );
-                        editView.add(editField);
+                            binder.forField(textField)
+                                    .bind((b) -> {
+                                                var o = b.get(f.getFieldName());
+                                                if (o == null) {
+                                                    return "";
+                                                }
+                                                return switch (o) {
+                                                    case String stringValue -> stringValue;
+                                                    case Integer integerValue -> Integer.toString(integerValue);
+                                                    case Long longValue -> Long.toString(longValue);
+                                                    case Double doubleValue -> Double.toString(doubleValue);
+                                                    case Boolean booleanValue -> Boolean.toString(booleanValue);
+                                                    case LocalDate localDateValue -> localDateValue.toString();
+                                                    case LocalDateTime localDateTimeValue -> localDateTimeValue.toString();
+                                                    case BigDecimal bigDecimalValue -> bigDecimalValue.toString();
+                                                    case Byte byteValue -> byteValue.toString();
+                                                    case Float floatValue -> floatValue.toString();
+                                                    default -> "";
+                                                };
+                                            }, (b, t) -> {
+                                                Object o = null;
+                                                if (t != null && !t.isEmpty()) {
+                                                    o = switch (f.getFieldType()) {
+                                                        case FIELD_TYPE_STRING -> t;
+                                                        case FIELD_TYPE_INTEGER -> Integer.parseInt(t);
+                                                        case FIELD_TYPE_DOUBLE -> Double.parseDouble(t);
+                                                        case FIELD_TYPE_LONG -> Long.parseLong(t);
+                                                        case FIELD_TYPE_BOOLEAN -> Boolean.parseBoolean(t);
+                                                        case FIELD_TYPE_DATE -> LocalDate.parse(t);
+                                                        case FIELD_TYPE_TIMESTAMP -> LocalDateTime.parse(t);
+                                                        case FIELD_TYPE_BIGDECIMAL -> BigDecimal.valueOf(Double.parseDouble(t));
+                                                        case FIELD_TYPE_BYTE -> Byte.parseByte(t);
+                                                        case FIELD_TYPE_FLOAT -> Float.parseFloat(t);
+                                                        case FIELD_TYPE_SHORT -> Short.parseShort(t);
+                                                        case FIELD_TYPE_CHAR -> t.charAt(0);
+                                                    };
+                                                }
+                                                b.put(f.getFieldName(), o);
+                                            }
+
+                                    );
+                            editView.add(textField);
+                        }
                     });
         }
 

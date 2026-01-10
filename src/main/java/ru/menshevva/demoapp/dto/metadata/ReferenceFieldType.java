@@ -11,7 +11,7 @@ public enum ReferenceFieldType {
     FIELD_TYPE_TIMESTAMP("Временная метка"), // Временная метка (java.sql.Timestamp)
     FIELD_TYPE_BIGDECIMAL("Точный десятичный"), // Точный десятичный тип (BigDecimal)
     FIELD_TYPE_BYTE("Байт"),            // Байтовый тип (byte[])
-    FIELD_TYPE_FLOAT("Дробное число float"), // Число с плавающей точкой (float)
+    FIELD_TYPE_FLOAT("Число с плавающей точкой"), // Число с плавающей точкой (float)
     FIELD_TYPE_SHORT("Короткое целое"), // Короткое целое число (short)
     FIELD_TYPE_CHAR("Символ"),          // Символьный тип (char)
     ;  // Неизвестный тип

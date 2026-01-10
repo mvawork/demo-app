@@ -16,6 +16,8 @@ import ru.menshevva.demoapp.dto.ChangeStatus;
 import ru.menshevva.demoapp.dto.metadata.ReferenceData;
 import ru.menshevva.demoapp.dto.metadata.ReferenceFieldData;
 
+import java.util.Comparator;
+
 public class MetaDataEditView extends VerticalLayout {
 
     private final Binder<ReferenceData> binder = new Binder<>();
@@ -69,7 +71,7 @@ public class MetaDataEditView extends VerticalLayout {
                         if (editFieldValue.getChangeStatus() == ChangeStatus.UNCHANGED) {
                             editFieldValue.setChangeStatus(ChangeStatus.MODIFIED);
                         }
-                        fieldEditDialog.setValue(editFieldValue, () -> fieldsGrid.getDataProvider().refreshItem(editFieldValue));
+                        fieldEditDialog.setValue(editFieldValue, () -> fieldsGrid.getDataProvider().refreshAll());
                     }
                 }
         );
@@ -93,6 +95,8 @@ public class MetaDataEditView extends VerticalLayout {
                 .setHeader("Имя поля");
         fieldsGrid.addColumn(ReferenceFieldData::getFieldTitle)
                 .setHeader("Наименование поля");
+        fieldsGrid.addColumn(f -> Boolean.TRUE.equals(f.getFieldKey()) ? "Да" : "Нет")
+                .setHeader("Ключевое поле");
         fieldsGrid.addColumn(ReferenceFieldData::getFieldLength)
                 .setHeader("Щирина поля");
         fieldsGrid.addColumn(ReferenceFieldData::getFieldOrder)
@@ -140,6 +144,7 @@ public class MetaDataEditView extends VerticalLayout {
         this.editValue = value;
         binder.readBean(value);
         var dataProvider = DataProvider.ofCollection(value.getMetaDataFieldsList());
+        dataProvider.setSortComparator((f1, f2) -> Integer.compare(f1.getFieldOrder(), f2.getFieldOrder()));
         dataProvider.setFilter(v -> v.getChangeStatus() != ChangeStatus.DELETED);
 
         fieldsGrid.setDataProvider(dataProvider);

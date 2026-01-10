@@ -62,7 +62,7 @@ public class MetaDataFieldEditDialog extends Dialog implements EditActionCallbac
                 );
         editView.add(fieldName, fieldTitle, fieldKey, fieldType, fieldLength, fieldOrder);
         content.setWidth(400, Unit.PIXELS);
-        content.setHeight(400, Unit.PIXELS);
+        //content.setHeight(400, Unit.PIXELS);
         content.add(editView, new EditActionComponent(this));
         content.setFlexGrow(1, editView);
         setCloseOnEsc(false);

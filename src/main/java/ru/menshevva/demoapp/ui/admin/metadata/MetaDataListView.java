@@ -5,6 +5,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.router.Route;
@@ -33,6 +34,8 @@ public class MetaDataListView extends VerticalLayout implements EditActionCallba
     private Button addButton;
     private Button editButton;
     private Button deleteButton;
+    private TextField schemaNameFilter;
+    private TextField tableNameFilter;
 
     public MetaDataListView(ReferenceSearchService searchService, MetaDataEditDialog editDialog) {
         this.searchService = searchService;
@@ -58,12 +61,20 @@ public class MetaDataListView extends VerticalLayout implements EditActionCallba
         leftPanel.add(addButton, editButton, deleteButton);
         var rightPanel = new HorizontalLayout();
         var searchButton = new Button("Найти");
+        searchButton.addClickListener(event -> refresh());
         var clearButton = new Button("Очистить");
+        clearButton.addClickListener(event -> clearFilter());
         rightPanel.add(searchButton, clearButton);
         rightPanel.setJustifyContentMode(JustifyContentMode.END);
         actionPanel.add(leftPanel, rightPanel);
         actionPanel.setFlexGrow(1, rightPanel);
         actionPanel.setWidthFull();
+    }
+
+    private void clearFilter() {
+        schemaNameFilter.clear();
+        tableNameFilter.clear();
+        refresh();
     }
 
     private void deleteAction(ClickEvent<Button> buttonClickEvent) {
@@ -84,12 +95,32 @@ public class MetaDataListView extends VerticalLayout implements EditActionCallba
 
     private void createGrid(ConfigurableFilterDataProvider<ReferenceData, Void, ReferenceFilter> dataProvider) {
         this.dataGrid = new Grid<>();
-        dataGrid.addColumn(ReferenceData::getSchemaName)
-                .setHeader("Схема");
-        dataGrid.addColumn(ReferenceData::getTableName)
-                .setHeader("Таблица");
+        var schemaColumn = dataGrid.addColumn(ReferenceData::getSchemaName)
+                .setKey(ReferenceFilter.FILTER_SCHEMA_NAME)
+                .setHeader("Схема")
+                .setSortable(true);
+
+        var tableColumn = dataGrid.addColumn(ReferenceData::getTableName)
+                .setKey(ReferenceFilter.FILTER_TABLE_NAME)
+                .setHeader("Таблица")
+                .setSortable(true);
+
         dataGrid.setDataProvider(dataProvider);
         dataGrid.addSelectionListener(selectionEvent -> setSelectedItem(selectionEvent.getFirstSelectedItem().orElse(null)));
+        var filterRow = dataGrid.appendHeaderRow();
+        //
+        this.schemaNameFilter = new TextField();
+        schemaNameFilter.setPlaceholder("Фильтр по схеме");
+        schemaNameFilter.setWidthFull();
+        schemaNameFilter.setClearButtonVisible(true);
+        filterRow.getCell(schemaColumn).setComponent(schemaNameFilter);
+        //
+        this.tableNameFilter = new TextField();
+        tableNameFilter.setPlaceholder("Фильтр по таблице");
+        tableNameFilter.setWidthFull();
+        tableNameFilter.setClearButtonVisible(true);
+        filterRow.getCell(tableColumn).setComponent(tableNameFilter);
+
     }
 
     private void setSelectedItem(ReferenceData referenceData) {
@@ -106,7 +137,14 @@ public class MetaDataListView extends VerticalLayout implements EditActionCallba
     private void refresh() {
         searchService.refresh();
         dataGrid.deselectAll();
-        //dataProvider.setFilter(buildQueryFilter());
+        dataProvider.setFilter(buildQueryFilter());
         dataProvider.refreshAll();
+    }
+
+    private ReferenceFilter buildQueryFilter() {
+        return ReferenceFilter.builder()
+                .schemaName(schemaNameFilter.getValue())
+                .tableName(tableNameFilter.getValue())
+                .build();
     }
 }

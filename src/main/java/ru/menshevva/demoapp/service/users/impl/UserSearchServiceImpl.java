@@ -52,7 +52,7 @@ public class UserSearchServiceImpl implements UserSearchService {
         var cq = cb.createTupleQuery();
         var root = cq.from(UserEntity.class);
         var col = cb.count(root);
-        cq.multiselect(col);
+        cq.select(cb.tuple(col));
         buildWhere(cb, cq, root, query);
         TypedQuery<Tuple> tq = em.createQuery(cq);
         setParams(tq, query);
@@ -65,9 +65,9 @@ public class UserSearchServiceImpl implements UserSearchService {
         var cb = em.getCriteriaBuilder();
         var cq = cb.createTupleQuery();
         var root = cq.from(UserEntity.class);
-        cq.multiselect(root.get(UserEntity_.userId).alias(UserEntity_.USER_ID),
+        cq.select(cb.tuple(root.get(UserEntity_.userId).alias(UserEntity_.USER_ID),
                 root.get(UserEntity_.userLogin).alias(UserEntity_.USER_LOGIN),
-                root.get(UserEntity_.userName).alias(UserEntity_.USER_NAME));
+                root.get(UserEntity_.userName).alias(UserEntity_.USER_NAME)));
         buildWhere(cb, cq, root, query);
         buildOrder(cb, cq, root, query);
         var tq = em.createQuery(cq);

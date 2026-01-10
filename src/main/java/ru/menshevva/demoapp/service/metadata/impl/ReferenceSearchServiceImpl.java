@@ -18,6 +18,7 @@ import ru.menshevva.demoapp.service.metadata.ReferenceFilter;
 import ru.menshevva.demoapp.service.metadata.ReferenceSearchService;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
@@ -41,6 +42,7 @@ public class ReferenceSearchServiceImpl implements ReferenceSearchService, Initi
         lock.readLock().lock();
         try {
             return referenceDataList.stream()
+                    .filter(v -> applyFilter(v, query.getFilter()))
                     .skip(query.getOffset())
                     .limit(query.getLimit());
         } finally {
@@ -48,11 +50,26 @@ public class ReferenceSearchServiceImpl implements ReferenceSearchService, Initi
         }
     }
 
+    private boolean applyFilter(ReferenceData value, Optional<ReferenceFilter> filter) {
+        return filter.map(v -> {
+            var result = true;
+            if (v.getSchemaName() != null && !v.getSchemaName().trim().isEmpty()) {
+                result = value.getSchemaName().contains(v.getSchemaName().trim());
+            }
+            if (result && v.getTableName() != null && !v.getTableName().trim().isEmpty()) {
+                result = value.getTableName().contains(v.getTableName().trim());
+            }
+            return result;
+        }).orElse(Boolean.TRUE);
+    }
+
     @Override
     public int count(Query<ReferenceData, ReferenceFilter> query) {
         lock.readLock().lock();
         try {
-            return referenceDataList.size();
+            return Math.toIntExact(referenceDataList.stream()
+                    .filter(v -> applyFilter(v, query.getFilter()))
+                    .count());
         } finally {
             lock.readLock().unlock();
         }

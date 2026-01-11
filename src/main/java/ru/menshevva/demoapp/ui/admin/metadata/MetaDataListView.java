@@ -31,11 +31,11 @@ public class MetaDataListView extends VerticalLayout implements EditActionCallba
     private Grid<ReferenceData> dataGrid;
     private HorizontalLayout actionPanel;
     private ReferenceData selectedItem;
-    private Button addButton;
     private Button editButton;
     private Button deleteButton;
     private TextField schemaNameFilter;
     private TextField tableNameFilter;
+    private TextField referenceNameFilter;
 
     public MetaDataListView(ReferenceSearchService searchService, MetaDataEditDialog editDialog) {
         this.searchService = searchService;
@@ -52,7 +52,7 @@ public class MetaDataListView extends VerticalLayout implements EditActionCallba
     private void createActionPanel() {
         this.actionPanel = new HorizontalLayout();
         var leftPanel = new HorizontalLayout();
-        this.addButton = new Button("Добавить");
+        Button addButton = new Button("Добавить");
         addButton.addClickListener(this::addAction);
         this.editButton = new Button("Изменить");
         editButton.addClickListener(this::editAction);
@@ -95,6 +95,11 @@ public class MetaDataListView extends VerticalLayout implements EditActionCallba
 
     private void createGrid(ConfigurableFilterDataProvider<ReferenceData, Void, ReferenceFilter> dataProvider) {
         this.dataGrid = new Grid<>();
+        var nameColumn = dataGrid.addColumn(ReferenceData::getReferenceName)
+                .setKey(ReferenceFilter.FILTER_REFERENCE_NAME)
+                .setHeader("Название")
+                .setSortable(true);
+
         var schemaColumn = dataGrid.addColumn(ReferenceData::getSchemaName)
                 .setKey(ReferenceFilter.FILTER_SCHEMA_NAME)
                 .setHeader("Схема")
@@ -108,6 +113,12 @@ public class MetaDataListView extends VerticalLayout implements EditActionCallba
         dataGrid.setDataProvider(dataProvider);
         dataGrid.addSelectionListener(selectionEvent -> setSelectedItem(selectionEvent.getFirstSelectedItem().orElse(null)));
         var filterRow = dataGrid.appendHeaderRow();
+        //
+        this.referenceNameFilter = new TextField();
+        referenceNameFilter.setPlaceholder("Фильтр по названию");
+        referenceNameFilter.setWidthFull();
+        referenceNameFilter.setClearButtonVisible(true);
+        filterRow.getCell(nameColumn).setComponent(referenceNameFilter);
         //
         this.schemaNameFilter = new TextField();
         schemaNameFilter.setPlaceholder("Фильтр по схеме");
@@ -143,6 +154,7 @@ public class MetaDataListView extends VerticalLayout implements EditActionCallba
 
     private ReferenceFilter buildQueryFilter() {
         return ReferenceFilter.builder()
+                .referenceName(referenceNameFilter.getValue())
                 .schemaName(schemaNameFilter.getValue())
                 .tableName(tableNameFilter.getValue())
                 .build();

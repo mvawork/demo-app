@@ -16,12 +16,10 @@ import ru.menshevva.demoapp.dto.ChangeStatus;
 import ru.menshevva.demoapp.dto.metadata.ReferenceData;
 import ru.menshevva.demoapp.dto.metadata.ReferenceFieldData;
 
-import java.util.Comparator;
 
 public class MetaDataEditView extends VerticalLayout {
 
     private final Binder<ReferenceData> binder = new Binder<>();
-    private final Tabs tabs;
     private VerticalLayout mainView;
     private TextArea sqlView;
     private HorizontalLayout fieldView;
@@ -29,7 +27,6 @@ public class MetaDataEditView extends VerticalLayout {
     private ReferenceData editValue;
     private Grid<ReferenceFieldData> fieldsGrid;
     private ReferenceFieldData editFieldValue;
-    private Button addButton;
     private Button editButton;
     private Button deleteButton;
 
@@ -37,7 +34,7 @@ public class MetaDataEditView extends VerticalLayout {
         initMainView();
         initSqlView();
         initFieldView();
-        this.tabs = new Tabs();
+        Tabs tabs = new Tabs();
         var mainTab = new Tab("Таблица");
         var sqlTab = new Tab("SQL запрос");
         var fieldTab = new Tab("Описание полей");
@@ -54,7 +51,7 @@ public class MetaDataEditView extends VerticalLayout {
 
     private void initFieldView() {
         var actionBlock = new VerticalLayout();
-        this.addButton = new Button("Добавить");
+        Button addButton = new Button("Добавить");
         addButton.setWidthFull();
         addButton.addClickListener(event -> {
             var value = new ReferenceFieldData();
@@ -90,7 +87,7 @@ public class MetaDataEditView extends VerticalLayout {
         deleteButton.setWidthFull();
 
         this.fieldView = new HorizontalLayout();
-        this.fieldsGrid = new Grid<ReferenceFieldData>();
+        this.fieldsGrid = new Grid<>();
         fieldsGrid.addColumn(ReferenceFieldData::getFieldName)
                 .setHeader("Имя поля");
         fieldsGrid.addColumn(ReferenceFieldData::getFieldTitle)
@@ -102,9 +99,7 @@ public class MetaDataEditView extends VerticalLayout {
         fieldsGrid.addColumn(ReferenceFieldData::getFieldOrder)
                 .setHeader("Позиция");
         fieldsGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
-        fieldsGrid.addSelectionListener(e -> {
-            setSelectedField(e.getFirstSelectedItem().orElse(null));
-        });
+        fieldsGrid.addSelectionListener(e -> setSelectedField(e.getFirstSelectedItem().orElse(null)));
 
         actionBlock.add(addButton, editButton, deleteButton);
         actionBlock.setWidth(100, Unit.PIXELS);
@@ -129,6 +124,11 @@ public class MetaDataEditView extends VerticalLayout {
 
     private void initMainView() {
         this.mainView = new VerticalLayout();
+        TextField referenceName = new TextField("Название справочника");
+        referenceName.setWidthFull();
+        binder.forField(referenceName)
+                .asRequired("Заполните название справочника")
+                .bind(ReferenceData::getReferenceName, ReferenceData::setReferenceName);
         TextField schemaName = new TextField("Имя схемы");
         schemaName.setWidth(100, Unit.PERCENTAGE);
         binder.forField(schemaName)
@@ -137,7 +137,7 @@ public class MetaDataEditView extends VerticalLayout {
         tableName.setWidth(100, Unit.PERCENTAGE);
         binder.forField(tableName)
                 .bind(ReferenceData::getTableName, ReferenceData::setTableName);
-        mainView.add(schemaName, tableName);
+        mainView.add(referenceName, schemaName, tableName);
     }
 
     public void setValue(ReferenceData value) {

@@ -28,7 +28,9 @@ public class MetaDataCRUDserviceImpl implements MetaDataCRUDservice {
     @Transactional
     public void save(ReferenceData value) {
         if (value == null) {
-            throw new IllegalArgumentException("value is null");
+            var msg = "Передано пустое значение";
+            log.error(msg);
+            throw new EAppException(msg);
         }
         if (value.getChangeStatus() == ChangeStatus.ADD) {
             add(value);
@@ -41,6 +43,7 @@ public class MetaDataCRUDserviceImpl implements MetaDataCRUDservice {
         var cb = entityManager.getCriteriaBuilder();
         var cu = cb.createCriteriaUpdate(ReferenceEntity.class);
         var root = cu.from(ReferenceEntity.class);
+        cu.set(ReferenceEntity_.referenceName, value.getReferenceName());
         cu.set(ReferenceEntity_.schemaName, value.getSchemaName());
         cu.set(ReferenceEntity_.tableName, value.getTableName());
         cu.set(ReferenceEntity_.tableSql, value.getTableSQL());
@@ -84,7 +87,7 @@ public class MetaDataCRUDserviceImpl implements MetaDataCRUDservice {
         e.setFieldKey(v.getFieldKey());
         e.setFieldLength(v.getFieldLength());
         e.setFieldOrder(v.getFieldOrder());
-        e.setFieldType(v.getFieldType().name() == null ? null : v.getFieldType().name());
+        e.setFieldType(v.getFieldType() == null ? null : v.getFieldType().name());
         entityManager.persist(e);
         v.setFieldId(e.getFieldId());
     }
@@ -114,6 +117,7 @@ public class MetaDataCRUDserviceImpl implements MetaDataCRUDservice {
 
     private void add(ReferenceData value) {
         var e = new ReferenceEntity();
+        e.setReferenceName(value.getReferenceName());
         e.setSchemaName(value.getSchemaName());
         e.setTableName(value.getTableName());
         e.setTableSql(value.getTableSQL());
@@ -123,7 +127,23 @@ public class MetaDataCRUDserviceImpl implements MetaDataCRUDservice {
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
+        deleteFields(id);
+        var cb = entityManager.getCriteriaBuilder();
+        var cd = cb.createCriteriaDelete(ReferenceEntity.class);
+        var root = cd.from(ReferenceEntity.class);
+        cd.where(cb.equal(root.get(ReferenceEntity_.referenceId), id));
+        entityManager.createQuery(cd).executeUpdate();
+
+    }
+
+    private void deleteFields(Long id) {
+        var cb = entityManager.getCriteriaBuilder();
+        var cd = cb.createCriteriaDelete(ReferenceFieldEntity.class);
+        var root = cd.from(ReferenceFieldEntity.class);
+        cd.where(cb.equal(root.get(ReferenceFieldEntity_.referenceId), id));
+        entityManager.createQuery(cd).executeUpdate();
 
     }
 }

@@ -12,6 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ReferenceData {
     private Long referenceId;
+    private String referenceName;
     private String schemaName;
     private String tableName;
     private String tableSQL;

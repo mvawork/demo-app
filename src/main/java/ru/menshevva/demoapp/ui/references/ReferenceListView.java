@@ -6,12 +6,14 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.PermitAll;
 import lombok.extern.slf4j.Slf4j;
 import ru.menshevva.demoapp.dto.metadata.ReferenceData;
+import ru.menshevva.demoapp.service.metadata.ReferenceFilter;
 import ru.menshevva.demoapp.service.metadata.ReferenceSearchService;
 import ru.menshevva.demoapp.ui.FrontendConsts;
 import ru.menshevva.demoapp.ui.MainMenuLayout;
@@ -49,7 +51,30 @@ public class ReferenceListView extends HorizontalLayout implements EditActionCal
                 .fromFilteringCallbacks(searchService::fetch, searchService::count)
                 .withConfigurableFilter();
         var metaDataGrid = new Grid<ReferenceData>();
-        metaDataGrid.addColumn(ReferenceData::getTableName);
+        var nameColumn = metaDataGrid.addColumn(ReferenceData::getReferenceName)
+                .setKey(ReferenceFilter.FILTER_REFERENCE_NAME)
+                //.setHeader("Название")
+                .setAutoWidth(true)
+                .setSortable(true);
+        //
+        var filterRow = metaDataGrid.appendHeaderRow();
+        var filterLayout = new HorizontalLayout();
+        TextField referenceNameFilter = new TextField();
+        referenceNameFilter.setPlaceholder("Фильтр по названию");
+        referenceNameFilter.setWidthFull();
+        referenceNameFilter.setClearButtonVisible(true);
+        var filterSearchReferenceButton = new Button("Ок");
+        filterSearchReferenceButton.addClickListener(event -> {
+                    metaDataGrid.deselectAll();
+                    dataProvider.setFilter(ReferenceFilter.builder().referenceName(referenceNameFilter.getValue()).build());
+                    dataProvider.refreshAll();
+                }
+        );
+        filterLayout.add(referenceNameFilter, filterSearchReferenceButton);
+        filterLayout.setWidthFull();
+        filterLayout.setFlexGrow(1, referenceNameFilter);
+        filterRow.getCell(nameColumn).setComponent(filterLayout);
+
         metaDataGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
         metaDataGrid.addSelectionListener(event -> {
             referenceData = event.getFirstSelectedItem().orElse(null);

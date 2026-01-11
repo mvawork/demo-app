@@ -78,10 +78,10 @@ public class MetaDataEditDialog extends Dialog implements EditActionCallback {
         }
     }
 
-    public void deleteValue(ReferenceData selectedItem, EditActionCallback editActionCallback) {
+    public void deleteValue(ReferenceData value, EditActionCallback editActionCallback) {
         this.editActionCallback = editActionCallback;
         if (value != null) {
-            service.delete(selectedItem.getReferenceId());
+            service.delete(value.getReferenceId());
             if (editActionCallback != null) {
                 editActionCallback.ok();
             }

@@ -53,7 +53,10 @@ public class ReferenceSearchServiceImpl implements ReferenceSearchService, Initi
     private boolean applyFilter(ReferenceData value, Optional<ReferenceFilter> filter) {
         return filter.map(v -> {
             var result = true;
-            if (v.getSchemaName() != null && !v.getSchemaName().trim().isEmpty()) {
+            if (v.getReferenceName() != null && !v.getReferenceName().trim().isEmpty()) {
+                result = value.getReferenceName().contains(v.getReferenceName().trim());
+            }
+            if (result && v.getSchemaName() != null && !v.getSchemaName().trim().isEmpty()) {
                 result = value.getSchemaName().contains(v.getSchemaName().trim());
             }
             if (result && v.getTableName() != null && !v.getTableName().trim().isEmpty()) {
@@ -97,6 +100,7 @@ public class ReferenceSearchServiceImpl implements ReferenceSearchService, Initi
         var joinField = root.join(ReferenceEntity_.referenceFieldEntities, JoinType.LEFT);
         cq.select(
                 cb.tuple(root.get(ReferenceEntity_.referenceId).alias(ReferenceEntity_.REFERENCE_ID),
+                        root.get(ReferenceEntity_.referenceName).alias(ReferenceEntity_.REFERENCE_NAME),
                         root.get(ReferenceEntity_.schemaName).alias(ReferenceEntity_.SCHEMA_NAME),
                         root.get(ReferenceEntity_.tableName).alias(ReferenceEntity_.TABLE_NAME),
                         root.get(ReferenceEntity_.tableSql).alias(ReferenceEntity_.TABLE_SQL),
@@ -122,6 +126,7 @@ public class ReferenceSearchServiceImpl implements ReferenceSearchService, Initi
                     var t = entry.getValue().getFirst();
                     var referenceData = ReferenceData.builder()
                             .referenceId(t.get(ReferenceEntity_.REFERENCE_ID, ReferenceEntity_.referenceId.getJavaType()))
+                            .referenceName(t.get(ReferenceEntity_.REFERENCE_NAME, ReferenceEntity_.referenceName.getJavaType()))
                             .schemaName(t.get(ReferenceEntity_.SCHEMA_NAME, ReferenceEntity_.schemaName.getJavaType()))
                             .tableName(t.get(ReferenceEntity_.TABLE_NAME, ReferenceEntity_.tableName.getJavaType()))
                             .tableSQL(t.get(ReferenceEntity_.TABLE_SQL, ReferenceEntity_.tableSql.getJavaType()))

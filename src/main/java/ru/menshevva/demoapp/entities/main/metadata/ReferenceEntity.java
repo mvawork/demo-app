@@ -18,6 +18,9 @@ public class ReferenceEntity {
     @GeneratedValue(generator = "SQ_DIC_REFERENCE", strategy = GenerationType.SEQUENCE)
     private Long referenceId;
 
+    @Column(name = "REFERENCE_NAME")
+    private String referenceName;
+
     @Column(name = "SCHEMA_NAME")
     private String schemaName;
 

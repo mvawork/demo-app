@@ -5,6 +5,7 @@ create table metadata.dic_reference
 (
     reference_id bigint not null
         primary key,
+    reference_name varchar(100) not null
     schema_name name not null,
     table_name  name not null,
     table_sql   text
@@ -13,6 +14,8 @@ create table metadata.dic_reference
 comment on table metadata.dic_reference is 'Описание метатданных для работы со соправочниками';
 
 comment on column metadata.dic_reference.reference_id is 'Идентификатор описания';
+
+comment on column metadata.dic_reference.reference_id is 'Название описания';
 
 comment on column metadata.dic_reference.schema_name is 'Имя схемы';
 

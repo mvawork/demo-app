@@ -17,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import ru.menshevva.demoapp.dto.metadata.ReferenceData;
 import ru.menshevva.demoapp.dto.metadata.ReferenceFieldData;
 import ru.menshevva.demoapp.service.metadata.DataGridSearchService;
-import ru.menshevva.demoapp.service.metadata.ReferenceFilter;
 import ru.menshevva.demoapp.service.metadata.ReferenceSearchService;
 import ru.menshevva.demoapp.ui.FrontendConsts;
 import ru.menshevva.demoapp.ui.MainMenuLayout;
@@ -39,13 +38,9 @@ import static ru.menshevva.demoapp.ui.FrontendConsts.TITLE_PAGE_REFERENCES;
 @Slf4j
 public class ReferenceListView extends HorizontalLayout implements EditActionCallback {
 
-    private final ReferenceSearchService searchService;
-    private final ConfigurableFilterDataProvider<ReferenceData, Void, ReferenceFilter> dataProvider;
     private final Grid<Map<String, ?>> referenceDataGrid;
-    private final DataGridSearchService referenceDataSearchService;
     private final ConfigurableFilterDataProvider<Map<String, ?>, Void, Map<String, ?>> referenceDataProvider;
     private final AutoEditReferenceDataEditDialog autoEditReferenceDataEditDialog;
-    private final Button addReferenceButton;
     private final Button editReferenceButton;
     private final Button deleteReferenceButton;
 
@@ -58,8 +53,6 @@ public class ReferenceListView extends HorizontalLayout implements EditActionCal
                              DataGridSearchService referenceDataSearchService,
                              AutoEditReferenceDataEditDialog autoEditReferenceDataEditDialog) {
         this.autoEditReferenceDataEditDialog = autoEditReferenceDataEditDialog;
-        this.searchService = searchService;
-        this.referenceDataSearchService = referenceDataSearchService;
 
         this.referenceDataProvider = DataProvider.
                 <Map<String, ?>, Map<String, ?>>fromFilteringCallbacks
@@ -67,7 +60,7 @@ public class ReferenceListView extends HorizontalLayout implements EditActionCal
                         query -> referenceDataSearchService.count(referenceData, query))
                 .withConfigurableFilter();
 
-        this.dataProvider = DataProvider
+        var dataProvider = DataProvider
                 .fromFilteringCallbacks(searchService::fetch, searchService::count)
                 .withConfigurableFilter();
         var metaDataGrid = new Grid<ReferenceData>();
@@ -80,7 +73,7 @@ public class ReferenceListView extends HorizontalLayout implements EditActionCal
         //
         var referenceDataAction = new HorizontalLayout();
         referenceDataAction.setWidthFull();
-        this.addReferenceButton = new Button("Добавить");
+        Button addReferenceButton = new Button("Добавить");
         addReferenceButton.addClickListener(this::addReferenceData);
         this.editReferenceButton = new Button("Изменить");
         editReferenceButton.addClickListener(this::editReferenceData);
@@ -91,9 +84,7 @@ public class ReferenceListView extends HorizontalLayout implements EditActionCal
         var searchReferenceButton = new Button("Найти");
         searchReferenceButton.addClickListener(event -> ok());
         var clearReferenceButton = new Button("Очистить");
-        clearReferenceButton.addClickListener(event -> {
-            clearFilter();
-        });
+        clearReferenceButton.addClickListener(event -> clearFilter());
 
         var rightReferenceDataActionBlock = new HorizontalLayout(searchReferenceButton, clearReferenceButton);
         rightReferenceDataActionBlock.setJustifyContentMode(JustifyContentMode.END);
@@ -106,9 +97,9 @@ public class ReferenceListView extends HorizontalLayout implements EditActionCal
 
         referenceDataGrid.setDataProvider(referenceDataProvider);
         referenceDataGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
-        referenceDataGrid.addSelectionListener(event -> {
-            setSelectedReferenceData(event.getFirstSelectedItem().orElse(null));
-        });
+        referenceDataGrid.addSelectionListener(event ->
+                setSelectedReferenceData(event.getFirstSelectedItem().orElse(null))
+        );
         setSelectedReferenceData(null);
         var rightBlock = new VerticalLayout(referenceDataAction, referenceDataGrid);
         rightBlock.setSizeFull();
@@ -116,7 +107,6 @@ public class ReferenceListView extends HorizontalLayout implements EditActionCal
         add(leftBlock, rightBlock);
         setFlexGrow(1, rightBlock);
         setSizeFull();
-
     }
 
     private void clearFilter() {

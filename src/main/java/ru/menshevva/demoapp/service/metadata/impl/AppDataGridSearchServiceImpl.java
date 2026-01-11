@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
 import ru.menshevva.demoapp.dto.metadata.ReferenceData;
-import ru.menshevva.demoapp.service.metadata.DataGridSearchService;
+import ru.menshevva.demoapp.service.metadata.AppDataGridSearchService;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -14,43 +14,38 @@ import java.util.stream.Stream;
 
 @Service
 @Slf4j
-public class DataGridSearchServiceImpl implements DataGridSearchService {
+public class AppDataGridSearchServiceImpl implements AppDataGridSearchService {
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
-    public DataGridSearchServiceImpl(NamedParameterJdbcTemplate jdbcTemplate) {
+    public AppDataGridSearchServiceImpl(NamedParameterJdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
     private String buildWhere(ReferenceData referenceData, Query<Map<String, ?>, Map<String, ?>> query, Map<String, Object> params) {
         var sb = new StringBuffer();
-        query.getFilter().ifPresent(v -> {
-
-            v.forEach((s, o) -> {
-                if (o == null) {
-                    return;
-                }
-                params.put(s, o);
-                if (!sb.isEmpty()) {
-                    sb.append("\n   AND");
-                }
-                referenceData.getMetaDataFieldsList()
-                        .stream()
-                        .filter(f -> f.getFieldName().equals(s))
-                        .findFirst()
-                        .ifPresent(f -> {
-                            switch (f.getFieldType()) {
-                                case FIELD_TYPE_STRING -> {
-                                    sb.append(" %s like :%s".formatted(s, s));
-                                    params.put(s, o);
-                                }
-                                default -> {
-                                    sb.append(" %s = :%s".formatted(s, s));
-                                }
+        query.getFilter().ifPresent(v -> v.forEach((s, o) -> {
+            if (o == null) {
+                return;
+            }
+            params.put(s, o);
+            if (!sb.isEmpty()) {
+                sb.append("\n   AND");
+            }
+            referenceData.getMetaDataFieldsList()
+                    .stream()
+                    .filter(f -> f.getFieldName().equals(s))
+                    .findFirst()
+                    .ifPresent(f -> {
+                        switch (f.getFieldType()) {
+                            case FIELD_TYPE_STRING -> {
+                                sb.append(" %s like :%s".formatted(s, s));
+                                params.put(s, o);
                             }
-                        });
-            });
-        });
+                            default -> sb.append(" %s = :%s".formatted(s, s));
+                        }
+                    });
+        }));
         return sb.toString();
     }
 
@@ -104,7 +99,7 @@ public class DataGridSearchServiceImpl implements DataGridSearchService {
             );
             return m;
         });
-        return result.stream().map(v -> (Map<String, ?>) v);
+        return result.stream().map(v -> v);
     }
 
     @Override

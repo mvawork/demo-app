@@ -7,18 +7,18 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.menshevva.demoapp.dto.metadata.ReferenceData;
 import ru.menshevva.demoapp.dto.metadata.ReferenceFieldData;
 import ru.menshevva.demoapp.exception.EAppException;
-import ru.menshevva.demoapp.service.metadata.ReferenceDataCRUDService;
+import ru.menshevva.demoapp.service.metadata.AutoEditCrudService;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
 @Slf4j
-public class ReferenceDataCRUDServiceImpl implements ReferenceDataCRUDService {
+public class AutoEditCrudServiceImpl implements AutoEditCrudService {
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
-    public ReferenceDataCRUDServiceImpl(NamedParameterJdbcTemplate jdbcTemplate) {
+    public AutoEditCrudServiceImpl(NamedParameterJdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 

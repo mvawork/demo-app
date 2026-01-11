@@ -1,7 +1,5 @@
 package ru.menshevva.demoapp.ui.references;
 
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -13,7 +11,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import ru.menshevva.demoapp.dto.metadata.ReferenceData;
 import ru.menshevva.demoapp.dto.metadata.ReferenceFieldData;
-import ru.menshevva.demoapp.service.metadata.ReferenceDataCRUDService;
+import ru.menshevva.demoapp.service.metadata.AutoEditCrudService;
 import ru.menshevva.demoapp.ui.components.EditActionCallback;
 import ru.menshevva.demoapp.ui.components.EditActionComponent;
 
@@ -30,13 +28,13 @@ import java.util.Map;
 public class AutoEditReferenceDataEditDialog extends Dialog implements EditActionCallback {
 
     private final VerticalLayout editView;
-    private final ReferenceDataCRUDService crudService;
+    private final AutoEditCrudService crudService;
     private EditActionCallback editActionCallback;
     private Map<String, Object> oldValue;
     private Binder<Map<String, Object>> binder = new Binder<>();
     private ReferenceData referenceData;
 
-    public AutoEditReferenceDataEditDialog(ReferenceDataCRUDService crudService) {
+    public AutoEditReferenceDataEditDialog(AutoEditCrudService crudService) {
         this.crudService = crudService;
         var content = new VerticalLayout();
         var editAction = new EditActionComponent(this);

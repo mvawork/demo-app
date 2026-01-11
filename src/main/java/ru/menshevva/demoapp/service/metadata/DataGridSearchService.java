@@ -7,7 +7,7 @@ import ru.menshevva.demoapp.dto.metadata.ReferenceData;
 import java.util.Map;
 import java.util.stream.Stream;
 
-public interface ReferenceDataSearchService {
+public interface DataGridSearchService {
     Stream<Map<String, ?>> search(ReferenceData referenceData, Query<Map<String, ?>, Map<String, ?>> query);
     int count (ReferenceData referenceData, Query<Map<String, ?>, Map<String, ?>> query);
 }

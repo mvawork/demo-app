@@ -16,7 +16,7 @@ import jakarta.annotation.security.PermitAll;
 import lombok.extern.slf4j.Slf4j;
 import ru.menshevva.demoapp.dto.metadata.ReferenceData;
 import ru.menshevva.demoapp.dto.metadata.ReferenceFieldData;
-import ru.menshevva.demoapp.service.metadata.ReferenceDataSearchService;
+import ru.menshevva.demoapp.service.metadata.DataGridSearchService;
 import ru.menshevva.demoapp.service.metadata.ReferenceFilter;
 import ru.menshevva.demoapp.service.metadata.ReferenceSearchService;
 import ru.menshevva.demoapp.ui.FrontendConsts;
@@ -42,7 +42,7 @@ public class ReferenceListView extends HorizontalLayout implements EditActionCal
     private final ReferenceSearchService searchService;
     private final ConfigurableFilterDataProvider<ReferenceData, Void, ReferenceFilter> dataProvider;
     private final Grid<Map<String, ?>> referenceDataGrid;
-    private final ReferenceDataSearchService referenceDataSearchService;
+    private final DataGridSearchService referenceDataSearchService;
     private final ConfigurableFilterDataProvider<Map<String, ?>, Void, Map<String, ?>> referenceDataProvider;
     private final AutoEditReferenceDataEditDialog autoEditReferenceDataEditDialog;
     private final Button addReferenceButton;
@@ -55,7 +55,7 @@ public class ReferenceListView extends HorizontalLayout implements EditActionCal
     private final Map<String, TextField> filters = new HashMap<>();
 
     public ReferenceListView(ReferenceSearchService searchService,
-                             ReferenceDataSearchService referenceDataSearchService,
+                             DataGridSearchService referenceDataSearchService,
                              AutoEditReferenceDataEditDialog autoEditReferenceDataEditDialog) {
         this.autoEditReferenceDataEditDialog = autoEditReferenceDataEditDialog;
         this.searchService = searchService;

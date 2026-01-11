@@ -2,27 +2,23 @@ package ru.menshevva.demoapp.service.metadata.impl;
 
 import com.vaadin.flow.data.provider.Query;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
 import ru.menshevva.demoapp.dto.metadata.ReferenceData;
-import ru.menshevva.demoapp.dto.metadata.ReferenceFieldData;
-import ru.menshevva.demoapp.service.metadata.ReferenceDataSearchService;
+import ru.menshevva.demoapp.service.metadata.DataGridSearchService;
 
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 @Service
 @Slf4j
-public class ReferenceDataSearchServiceImpl implements ReferenceDataSearchService {
+public class DataGridSearchServiceImpl implements DataGridSearchService {
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
-    public ReferenceDataSearchServiceImpl(NamedParameterJdbcTemplate jdbcTemplate) {
+    public DataGridSearchServiceImpl(NamedParameterJdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 

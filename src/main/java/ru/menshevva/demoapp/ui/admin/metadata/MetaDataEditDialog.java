@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Scope;
 import ru.menshevva.demoapp.dto.ChangeStatus;
 import ru.menshevva.demoapp.dto.metadata.ReferenceData;
 import ru.menshevva.demoapp.service.metadata.MetaDataCRUDservice;
+import ru.menshevva.demoapp.service.metadata.ReferenceSearchService;
 import ru.menshevva.demoapp.ui.components.EditActionCallback;
 import ru.menshevva.demoapp.ui.components.EditActionComponent;
 
@@ -21,12 +22,14 @@ public class MetaDataEditDialog extends Dialog implements EditActionCallback {
 
 
     private final MetaDataEditView editView;
-    private final MetaDataCRUDservice service;
+    private final transient MetaDataCRUDservice service;
+    private final transient ReferenceSearchService searchService;
     private ReferenceData value;
-    private EditActionCallback editActionCallback;
+    private transient EditActionCallback editActionCallback;
 
-    public MetaDataEditDialog(MetaDataCRUDservice service) {
+    public MetaDataEditDialog(MetaDataCRUDservice service, ReferenceSearchService searchService) {
         this.service = service;
+        this.searchService = searchService;
         var content = new VerticalLayout();
         this.editView = new MetaDataEditView();
         content.setWidth(800, Unit.PIXELS);
@@ -60,6 +63,7 @@ public class MetaDataEditDialog extends Dialog implements EditActionCallback {
             try {
                 editView.getValue(value);
                 service.save(value);
+                searchService.refresh(value.getReferenceId());
                 close();
                 if (editActionCallback != null) {
                     editActionCallback.ok();

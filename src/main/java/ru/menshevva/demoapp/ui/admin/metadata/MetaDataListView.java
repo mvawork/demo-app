@@ -25,7 +25,6 @@ import ru.menshevva.demoapp.ui.components.EditActionCallback;
 @Route(value = FrontendConsts.PAGE_ADMIN_METADATA_LIST, layout = AdminLayout.class)
 public class MetaDataListView extends VerticalLayout implements EditActionCallback {
 
-    private final ReferenceSearchService searchService;
     private final ConfigurableFilterDataProvider<ReferenceData, Void, ReferenceFilter> dataProvider;
     private final MetaDataEditDialog editDialog;
     private Grid<ReferenceData> dataGrid;
@@ -38,7 +37,6 @@ public class MetaDataListView extends VerticalLayout implements EditActionCallba
     private TextField referenceNameFilter;
 
     public MetaDataListView(ReferenceSearchService searchService, MetaDataEditDialog editDialog) {
-        this.searchService = searchService;
         this.editDialog = editDialog;
         this.dataProvider = DataProvider
                 .fromFilteringCallbacks(searchService::fetch,
@@ -146,7 +144,6 @@ public class MetaDataListView extends VerticalLayout implements EditActionCallba
     }
 
     private void refresh() {
-        searchService.refresh();
         dataGrid.deselectAll();
         dataProvider.setFilter(buildQueryFilter());
         dataProvider.refreshAll();

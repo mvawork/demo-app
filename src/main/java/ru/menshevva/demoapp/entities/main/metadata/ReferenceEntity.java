@@ -30,6 +30,9 @@ public class ReferenceEntity {
     @Column(name = "TABLE_SQL")
     private String tableSql;
 
+    @Column(name = "JVM_SCRIPT")
+    private String jvmScript;
+
     @OneToMany
     @JoinColumn(name = "reference_id", referencedColumnName = "reference_id", insertable = false, updatable = false)
     private List<ReferenceFieldEntity> referenceFieldEntities;

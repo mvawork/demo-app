@@ -8,7 +8,8 @@ create table metadata.dic_reference
     reference_name varchar(100) not null
     schema_name name not null,
     table_name  name not null,
-    table_sql   text
+    table_sql   text,
+    jvm_script text
 );
 
 comment on table metadata.dic_reference is 'Описание метатданных для работы со соправочниками';
@@ -22,6 +23,8 @@ comment on column metadata.dic_reference.schema_name is 'Имя схемы';
 comment on column metadata.dic_reference.table_name is 'Имя таблицы';
 
 comment on column metadata.dic_reference.table_sql is 'SQL запрос';
+
+comment on column metadata.dic_reference.jvm_script is 'JVM скрипт';
 
 alter table metadata.dic_reference owner to testapp;
 

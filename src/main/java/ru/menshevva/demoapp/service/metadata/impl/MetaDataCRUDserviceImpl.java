@@ -39,6 +39,18 @@ public class MetaDataCRUDserviceImpl implements MetaDataCRUDservice {
         }
     }
 
+    private void add(ReferenceData value) {
+        var e = new ReferenceEntity();
+        e.setReferenceName(value.getReferenceName());
+        e.setSchemaName(value.getSchemaName());
+        e.setTableName(value.getTableName());
+        e.setTableSql(value.getTableSQL());
+        e.setJvmScript(value.getJvmScript());
+        entityManager.persist(e);
+        value.setReferenceId(e.getReferenceId());
+        saveFields(value);
+    }
+
     private void update(ReferenceData value) {
         var cb = entityManager.getCriteriaBuilder();
         var cu = cb.createCriteriaUpdate(ReferenceEntity.class);
@@ -47,6 +59,7 @@ public class MetaDataCRUDserviceImpl implements MetaDataCRUDservice {
         cu.set(ReferenceEntity_.schemaName, value.getSchemaName());
         cu.set(ReferenceEntity_.tableName, value.getTableName());
         cu.set(ReferenceEntity_.tableSql, value.getTableSQL());
+        cu.set(ReferenceEntity_.jvmScript, value.getJvmScript());
         cu.where(cb.equal(root.get(ReferenceEntity_.referenceId), value.getReferenceId()));
         entityManager.createQuery(cu).executeUpdate();
         saveFields(value);
@@ -115,16 +128,6 @@ public class MetaDataCRUDserviceImpl implements MetaDataCRUDservice {
     }
 
 
-    private void add(ReferenceData value) {
-        var e = new ReferenceEntity();
-        e.setReferenceName(value.getReferenceName());
-        e.setSchemaName(value.getSchemaName());
-        e.setTableName(value.getTableName());
-        e.setTableSql(value.getTableSQL());
-        entityManager.persist(e);
-        value.setReferenceId(e.getReferenceId());
-        saveFields(value);
-    }
 
     @Override
     @Transactional

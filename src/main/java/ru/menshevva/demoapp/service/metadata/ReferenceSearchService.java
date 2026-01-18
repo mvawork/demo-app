@@ -9,7 +9,7 @@ public interface ReferenceSearchService {
 
     Stream<ReferenceData> fetch(Query<ReferenceData, ReferenceFilter> query);
 
-    void refresh();
+    void refresh(Long referenceId);
 
     int count(Query<ReferenceData, ReferenceFilter> query);
 }

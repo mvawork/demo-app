@@ -17,8 +17,8 @@ import ru.menshevva.demoapp.entities.main.metadata.ReferenceFieldEntity_;
 import ru.menshevva.demoapp.service.metadata.ReferenceFilter;
 import ru.menshevva.demoapp.service.metadata.ReferenceSearchService;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
@@ -42,7 +42,7 @@ public class ReferenceSearchServiceImpl implements ReferenceSearchService, Initi
         lock.readLock().lock();
         try {
             return referenceDataList.stream()
-                    .filter(v -> applyFilter(v, query.getFilter()))
+                    .filter(v -> applyFilter(v, query.getFilter().orElse(null)))
                     .skip(query.getOffset())
                     .limit(query.getLimit());
         } finally {
@@ -50,20 +50,21 @@ public class ReferenceSearchServiceImpl implements ReferenceSearchService, Initi
         }
     }
 
-    private boolean applyFilter(ReferenceData value, Optional<ReferenceFilter> filter) {
-        return filter.map(v -> {
-            var result = true;
-            if (v.getReferenceName() != null && !v.getReferenceName().trim().isEmpty()) {
-                result = value.getReferenceName().contains(v.getReferenceName().trim());
-            }
-            if (result && v.getSchemaName() != null && !v.getSchemaName().trim().isEmpty()) {
-                result = value.getSchemaName().contains(v.getSchemaName().trim());
-            }
-            if (result && v.getTableName() != null && !v.getTableName().trim().isEmpty()) {
-                result = value.getTableName().contains(v.getTableName().trim());
-            }
-            return result;
-        }).orElse(Boolean.TRUE);
+    private boolean applyFilter(ReferenceData value, ReferenceFilter filter) {
+        if (filter == null) {
+            return true;
+        }
+        var result = true;
+        if (filter.getReferenceName() != null && !filter.getReferenceName().trim().isEmpty()) {
+            result = value.getReferenceName().contains(filter.getReferenceName().trim());
+        }
+        if (result && filter.getSchemaName() != null && !filter.getSchemaName().trim().isEmpty()) {
+            result = value.getSchemaName().contains(filter.getSchemaName().trim());
+        }
+        if (result && filter.getTableName() != null && !filter.getTableName().trim().isEmpty()) {
+            result = value.getTableName().contains(filter.getTableName().trim());
+        }
+        return result;
     }
 
     @Override
@@ -71,7 +72,7 @@ public class ReferenceSearchServiceImpl implements ReferenceSearchService, Initi
         lock.readLock().lock();
         try {
             return Math.toIntExact(referenceDataList.stream()
-                    .filter(v -> applyFilter(v, query.getFilter()))
+                    .filter(v -> applyFilter(v, query.getFilter().orElse(null)))
                     .count());
         } finally {
             lock.readLock().unlock();
@@ -80,20 +81,20 @@ public class ReferenceSearchServiceImpl implements ReferenceSearchService, Initi
 
     @Override
     public void afterPropertiesSet() {
-        refresh();
+        refresh(null);
     }
 
     @Override
-    public void refresh() {
+    public void refresh(Long referenceId) {
         lock.writeLock().lock();
         try {
-            loadData();
+            loadData(referenceId);
         } finally {
             lock.writeLock().unlock();
         }
     }
 
-    private void loadData() {
+    private void loadData(Long referenceId) {
         var cb = em.getCriteriaBuilder();
         var cq = cb.createTupleQuery();
         var root = cq.from(ReferenceEntity.class);
@@ -104,6 +105,7 @@ public class ReferenceSearchServiceImpl implements ReferenceSearchService, Initi
                         root.get(ReferenceEntity_.schemaName).alias(ReferenceEntity_.SCHEMA_NAME),
                         root.get(ReferenceEntity_.tableName).alias(ReferenceEntity_.TABLE_NAME),
                         root.get(ReferenceEntity_.tableSql).alias(ReferenceEntity_.TABLE_SQL),
+                        root.get(ReferenceEntity_.jvmScript).alias(ReferenceEntity_.JVM_SCRIPT),
                         joinField.get(ReferenceFieldEntity_.fieldId).alias(ReferenceFieldEntity_.FIELD_ID),
                         joinField.get(ReferenceFieldEntity_.fieldName).alias(ReferenceFieldEntity_.FIELD_NAME),
                         joinField.get(ReferenceFieldEntity_.fieldTitle).alias(ReferenceFieldEntity_.FIELD_TITLE),
@@ -113,43 +115,50 @@ public class ReferenceSearchServiceImpl implements ReferenceSearchService, Initi
                         joinField.get(ReferenceFieldEntity_.fieldLength).alias(ReferenceFieldEntity_.FIELD_LENGTH)
                 )
         );
+        if (referenceId != null) {
+            cq.where(cb.equal(root.get(ReferenceEntity_.referenceId), referenceId));
+        }
         var results = em.createQuery(cq)
                 .getResultList()
                 .stream()
                 .collect(Collectors.groupingBy(t ->
                         t.get(ReferenceEntity_.REFERENCE_ID, ReferenceEntity_.referenceId.getJavaType())
                 ));
+        var data = new ArrayList<ReferenceData>();
 
-        this.referenceDataList = results.entrySet()
-                .stream()
-                .map(entry -> {
-                    var t = entry.getValue().getFirst();
-                    var referenceData = ReferenceData.builder()
-                            .referenceId(t.get(ReferenceEntity_.REFERENCE_ID, ReferenceEntity_.referenceId.getJavaType()))
-                            .referenceName(t.get(ReferenceEntity_.REFERENCE_NAME, ReferenceEntity_.referenceName.getJavaType()))
-                            .schemaName(t.get(ReferenceEntity_.SCHEMA_NAME, ReferenceEntity_.schemaName.getJavaType()))
-                            .tableName(t.get(ReferenceEntity_.TABLE_NAME, ReferenceEntity_.tableName.getJavaType()))
-                            .tableSQL(t.get(ReferenceEntity_.TABLE_SQL, ReferenceEntity_.tableSql.getJavaType()))
+        results.forEach((k, v) -> {
+            var t = v.getFirst();
+            var referenceData = ReferenceData.builder()
+                    .referenceId(t.get(ReferenceEntity_.REFERENCE_ID, ReferenceEntity_.referenceId.getJavaType()))
+                    .referenceName(t.get(ReferenceEntity_.REFERENCE_NAME, ReferenceEntity_.referenceName.getJavaType()))
+                    .schemaName(t.get(ReferenceEntity_.SCHEMA_NAME, ReferenceEntity_.schemaName.getJavaType()))
+                    .tableName(t.get(ReferenceEntity_.TABLE_NAME, ReferenceEntity_.tableName.getJavaType()))
+                    .tableSQL(t.get(ReferenceEntity_.TABLE_SQL, ReferenceEntity_.tableSql.getJavaType()))
+                    .jvmScript(t.get(ReferenceEntity_.JVM_SCRIPT, ReferenceEntity_.jvmScript.getJavaType()))
+                    .changeStatus(ChangeStatus.UNCHANGED)
+                    .build();
+            var fieldList = v.stream()
+                    .filter(f -> f.get(ReferenceFieldEntity_.FIELD_ID, ReferenceFieldEntity_.referenceId.getJavaType()) != null)
+                    .map(f -> ReferenceFieldData.builder()
+                            .fieldId(f.get(ReferenceFieldEntity_.FIELD_ID, ReferenceFieldEntity_.referenceId.getJavaType()))
+                            .fieldName(f.get(ReferenceFieldEntity_.FIELD_NAME, ReferenceFieldEntity_.fieldName.getJavaType()))
+                            .fieldTitle(f.get(ReferenceFieldEntity_.FIELD_TITLE, ReferenceFieldEntity_.fieldTitle.getJavaType()))
+                            .fieldLength(f.get(ReferenceFieldEntity_.FIELD_LENGTH, ReferenceFieldEntity_.fieldLength.getJavaType()))
+                            .fieldOrder(f.get(ReferenceFieldEntity_.FIELD_ORDER, ReferenceFieldEntity_.fieldOrder.getJavaType()))
+                            .fieldType(ReferenceFieldType.getForName(f.get(ReferenceFieldEntity_.FIELD_TYPE, ReferenceFieldEntity_.fieldType.getJavaType())))
+                            .fieldKey(f.get(ReferenceFieldEntity_.FIELD_KEY, ReferenceFieldEntity_.fieldKey.getJavaType()))
                             .changeStatus(ChangeStatus.UNCHANGED)
-                            .build();
-                    var fieldList = entry.getValue().stream()
-                            .filter(v -> v.get(ReferenceFieldEntity_.FIELD_ID, ReferenceFieldEntity_.referenceId.getJavaType()) != null)
-                            .map(v -> ReferenceFieldData.builder()
-                                    .fieldId(v.get(ReferenceFieldEntity_.FIELD_ID, ReferenceFieldEntity_.referenceId.getJavaType()))
-                                    .fieldName(v.get(ReferenceFieldEntity_.FIELD_NAME, ReferenceFieldEntity_.fieldName.getJavaType()))
-                                    .fieldTitle(v.get(ReferenceFieldEntity_.FIELD_TITLE, ReferenceFieldEntity_.fieldTitle.getJavaType()))
-                                    .fieldLength(v.get(ReferenceFieldEntity_.FIELD_LENGTH, ReferenceFieldEntity_.fieldLength.getJavaType()))
-                                    .fieldOrder(v.get(ReferenceFieldEntity_.FIELD_ORDER, ReferenceFieldEntity_.fieldOrder.getJavaType()))
-                                    .fieldType(ReferenceFieldType.getForName(v.get(ReferenceFieldEntity_.FIELD_TYPE, ReferenceFieldEntity_.fieldType.getJavaType())))
-                                    .fieldKey(v.get(ReferenceFieldEntity_.FIELD_KEY, ReferenceFieldEntity_.fieldKey.getJavaType()))
-                                    .changeStatus(ChangeStatus.UNCHANGED)
-                                    .build()
-                            )
-                            .collect(Collectors.toList());
-                    referenceData.setMetaDataFieldsList(fieldList);
-                    return referenceData;
-                })
-                .toList();
-
+                            .build()
+                    )
+                    .collect(Collectors.toCollection(ArrayList::new));
+            referenceData.setMetaDataFieldsList(fieldList);
+            data.add(referenceData);
+        });
+        if (referenceId == null) {
+            this.referenceDataList = data;
+        } else {
+            this.referenceDataList.removeIf(f -> f.getReferenceId().equals(referenceId));
+            this.referenceDataList.addAll(data);
+        }
     }
 }

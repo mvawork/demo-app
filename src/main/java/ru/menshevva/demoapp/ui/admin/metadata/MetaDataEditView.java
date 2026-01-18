@@ -22,6 +22,7 @@ public class MetaDataEditView extends VerticalLayout {
     private final Binder<ReferenceData> binder = new Binder<>();
     private VerticalLayout mainView;
     private TextArea sqlView;
+    private TextArea jvmScriptView;
     private HorizontalLayout fieldView;
     private final MetaDataFieldEditDialog fieldEditDialog = new MetaDataFieldEditDialog();
     private ReferenceData editValue;
@@ -34,19 +35,29 @@ public class MetaDataEditView extends VerticalLayout {
         initMainView();
         initSqlView();
         initFieldView();
+        initJvmScript();
         Tabs tabs = new Tabs();
         var mainTab = new Tab("Таблица");
         var sqlTab = new Tab("SQL запрос");
         var fieldTab = new Tab("Описание полей");
-        tabs.add(mainTab, sqlTab, fieldTab);
+        var jvmScriptTab = new Tab("Скрипт");
+        tabs.add(mainTab, sqlTab, jvmScriptTab, fieldTab);
         tabs.addSelectedChangeListener(e -> {
             mainView.setVisible(e.getSelectedTab() == mainTab);
             sqlView.setVisible(e.getSelectedTab() == sqlTab);
             fieldView.setVisible(e.getSelectedTab() == fieldTab);
+            jvmScriptView.setVisible(e.getSelectedTab() == jvmScriptTab);
         });
-        add(tabs, mainView, sqlView, fieldView);
+        add(tabs, mainView, sqlView, jvmScriptView, fieldView);
         tabs.setSelectedTab(mainTab);
         setSizeFull();
+    }
+
+    private void initJvmScript() {
+        this.jvmScriptView = new TextArea("Groovy скрипт");
+        binder.forField(jvmScriptView).bind(ReferenceData::getJvmScript, ReferenceData::setJvmScript);
+        jvmScriptView.setSizeFull();
+        this.jvmScriptView.setVisible(false);
     }
 
     private void initFieldView() {

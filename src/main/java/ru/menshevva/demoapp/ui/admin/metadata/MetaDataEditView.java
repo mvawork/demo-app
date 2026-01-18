@@ -15,14 +15,16 @@ import com.vaadin.flow.data.provider.DataProvider;
 import ru.menshevva.demoapp.dto.ChangeStatus;
 import ru.menshevva.demoapp.dto.metadata.ReferenceData;
 import ru.menshevva.demoapp.dto.metadata.ReferenceFieldData;
+import ru.menshevva.demoapp.service.script.ReferenceDataProcessorService;
 
 
 public class MetaDataEditView extends VerticalLayout {
 
     private final Binder<ReferenceData> binder = new Binder<>();
+    private final transient ReferenceDataProcessorService referenceDataProcessorService;
     private VerticalLayout mainView;
     private TextArea sqlView;
-    private TextArea jvmScriptView;
+    private VerticalLayout jvmScriptView;
     private HorizontalLayout fieldView;
     private final MetaDataFieldEditDialog fieldEditDialog = new MetaDataFieldEditDialog();
     private ReferenceData editValue;
@@ -31,7 +33,8 @@ public class MetaDataEditView extends VerticalLayout {
     private Button editButton;
     private Button deleteButton;
 
-    public MetaDataEditView() {
+    public MetaDataEditView(ReferenceDataProcessorService referenceDataProcessorService) {
+        this.referenceDataProcessorService = referenceDataProcessorService;
         initMainView();
         initSqlView();
         initFieldView();
@@ -54,10 +57,22 @@ public class MetaDataEditView extends VerticalLayout {
     }
 
     private void initJvmScript() {
-        this.jvmScriptView = new TextArea("Groovy скрипт");
-        binder.forField(jvmScriptView).bind(ReferenceData::getJvmScript, ReferenceData::setJvmScript);
-        jvmScriptView.setSizeFull();
-        this.jvmScriptView.setVisible(false);
+        var content = new VerticalLayout();
+        var jvmScript = new TextArea("Groovy скрипт");
+        binder.forField(jvmScript).bind(ReferenceData::getJvmScript, ReferenceData::setJvmScript);
+        jvmScript.setSizeFull();
+        var checkButton = new Button("Проверить");
+        checkButton.addClickListener(event -> {
+            var script = referenceDataProcessorService.createScriptFromString(jvmScript.getValue());
+            script.info("Проверка скрипта");
+        });
+        var jvmScriptActionPanel = new HorizontalLayout(checkButton);
+
+        content.add(jvmScriptActionPanel, jvmScript);
+        content.setFlexGrow(1, jvmScript);
+        content.setVisible(false);
+        this.jvmScriptView = content;
+
     }
 
     private void initFieldView() {

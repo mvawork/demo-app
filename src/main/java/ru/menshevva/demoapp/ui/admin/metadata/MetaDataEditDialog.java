@@ -11,6 +11,7 @@ import ru.menshevva.demoapp.dto.ChangeStatus;
 import ru.menshevva.demoapp.dto.metadata.ReferenceData;
 import ru.menshevva.demoapp.service.metadata.MetaDataCRUDservice;
 import ru.menshevva.demoapp.service.metadata.ReferenceSearchService;
+import ru.menshevva.demoapp.service.script.ReferenceDataProcessorService;
 import ru.menshevva.demoapp.ui.components.EditActionCallback;
 import ru.menshevva.demoapp.ui.components.EditActionComponent;
 
@@ -27,11 +28,12 @@ public class MetaDataEditDialog extends Dialog implements EditActionCallback {
     private ReferenceData value;
     private transient EditActionCallback editActionCallback;
 
-    public MetaDataEditDialog(MetaDataCRUDservice service, ReferenceSearchService searchService) {
+    public MetaDataEditDialog(MetaDataCRUDservice service, ReferenceSearchService searchService,
+                              ReferenceDataProcessorService referenceDataProcessorService) {
         this.service = service;
         this.searchService = searchService;
         var content = new VerticalLayout();
-        this.editView = new MetaDataEditView();
+        this.editView = new MetaDataEditView(referenceDataProcessorService);
         content.setWidth(800, Unit.PIXELS);
         content.setHeight(600, Unit.PIXELS);
         content.add(editView, new EditActionComponent(this));
